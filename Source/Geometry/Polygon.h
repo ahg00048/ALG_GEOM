@@ -7,14 +7,10 @@
  * Created on 19 de enero de 2021, 10:20
  */
 
-#include <vector>
-#include <iostream>
 #include "Line.h"
 #include "RayLine.h"
-#include "SegmentLine.h"
-#include "Vect2d.h"
 #include "Vertex.h"
-
+#include <iostream>
     
 class Polygon
 {
@@ -136,4 +132,3 @@ public:
 	*/
 	void set(Vertex& vertex, int pos);
 };
-

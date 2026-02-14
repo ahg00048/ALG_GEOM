@@ -9,7 +9,6 @@
 
 #include "Point.h"
 
-
 class PointCloud
 {
 protected:

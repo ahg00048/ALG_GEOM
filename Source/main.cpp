@@ -3,8 +3,14 @@
 #include "Renderer.h"
 #include "Window.h"
 
+static void glfwError(int id, const char* description)
+{
+    std::cout << description << std::endl;
+}
+
 int main()
 {
+    //glfwSetErrorCallback(&glfwError);
     AlgGeom::Window* window = AlgGeom::Window::getInstance();
     AlgGeom::Renderer* renderer = AlgGeom::Renderer::getInstance();
 

@@ -377,9 +377,6 @@
     <ClInclude Include="Rendering\DrawVoxelization.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="Util\StringUtilities.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\triangle-fs.glsl">

@@ -3,7 +3,6 @@
 #include "RandomUtilities.h"
 #include "StringUtilities.h"
 
-
 PointCloud::PointCloud()
 {
 }
@@ -20,7 +19,19 @@ PointCloud::PointCloud(int size, float max_x, float max_y)
 
 PointCloud::PointCloud(const std::string& filename)
 {
-	save(filename);
+	std::string line = "";
+	std::ifstream file(filename);
+
+	if (file.is_open())
+	{
+		while (std::getline(file, line))
+		{
+			const std::vector<std::string_view>& strs = StringUtilities::split(line, ';');
+
+			_points.emplace_back(std::stod(strs[0].data()), std::stod(strs[1].data()));
+		}
+		file.close();
+	}
 }
 
 PointCloud::~PointCloud()
@@ -89,14 +100,13 @@ PointCloud & PointCloud::operator=(const PointCloud& pointCloud)
 
 void PointCloud::save(const std::string& filename)
 {
-	std::string line = "";
-	std::ifstream file(filename);
+	std::ofstream file(filename);
 
-	if (file.is_open()) {
-		while (std::getline(file, line)) 
+	if (file.is_open()) 
+	{
+		for (const Point& p : _points) 
 		{
-			const std::vector<std::string_view>& strs = split(line.c_str(), ';');
-			_points.emplace_back(std::stod(strs[0].data()), std::stod(strs[1].data(), false));
+			file << std::format("{};{}\n", p.getX(), p.getY());;
 		}
 		file.close();
 	}

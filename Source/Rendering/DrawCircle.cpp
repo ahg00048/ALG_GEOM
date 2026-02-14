@@ -15,7 +15,6 @@ AlgGeom::DrawCircle::DrawCircle(Circle& circle, uint32_t numSubdivisions): Model
         Point point = polygon.getVertexAt(vertexIdx).getPoint();
         component->_vertices.push_back(VAO::Vertex{ vec3(point.getX(), point.getY(), .0f), vec3(.0f, .0f, 1.0f) });
     }
-    component->_vertices.push_back(VAO::Vertex{ vec3(.0f, .0f, .0f) });
 
     for (unsigned vertexIdx = 0; vertexIdx < polygon.getNumVertices(); vertexIdx++) {
 

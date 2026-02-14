@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -131,7 +131,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>Fonts/;Patterns/;Rendering/;Geometry/;Util/;PrecompiledHeaders/;../../Libraries/ImGuiFileDialog</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Fonts/;Patterns/;Util/;Rendering/;Geometry/;PrecompiledHeaders/;../../Libraries/ImGuiFileDialog</AdditionalIncludeDirectories>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>

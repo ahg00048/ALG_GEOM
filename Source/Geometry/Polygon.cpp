@@ -1,5 +1,3 @@
-#include <fstream>
-
 #include "stdafx.h"
 #include "Polygon.h"
 #include "StringUtilities.h"
@@ -27,7 +25,21 @@ SegmentLine Polygon::getEdge(int i)
 
 Polygon::Polygon(const std::string & filename)
 {
-	save(filename);
+	std::string line = "";
+	std::ifstream file(filename);
+
+	if (file.is_open())
+	{
+		while (std::getline(file, line))
+		{
+			const std::vector<std::string_view>& strs = StringUtilities::split(line, ';');
+
+			int pos = _vertices.size();
+			Point p(std::stod(strs[0].data()), std::stod(strs[1].data()));
+			_vertices.emplace_back(p, this, pos);
+		}
+		file.close();
+	}
 }
 
 Polygon::~Polygon()
@@ -144,16 +156,13 @@ bool Polygon::pointInConvexPolygonGeo(Point& point)
 
 void Polygon::save(const std::string& filename)
 {
-	std::string line = "";
-	std::ifstream file(filename);
+	std::ofstream file(filename);
 
-	if (file.is_open()) 
+	if (file.is_open())
 	{
-		while (std::getline(file, line)) 
+		for (const Vertex& v : _vertices)
 		{
-			const std::vector<std::string_view>& strs = split(line.c_str(), ';');
-			size_t pos = _vertices.size();
-			_vertices.emplace_back(Point(std::stod(strs[0].data()), std::stod(strs[1].data(), false)), this, pos);
+			file << std::format("{};{}\n", v.getX(), v.getY());;
 		}
 		file.close();
 	}

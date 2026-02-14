@@ -23,7 +23,7 @@ Polygon Circle::getPointsCircle(uint32_t numSubdivisions)
 
     while (angle < (2.0f * glm::pi<float>() + glm::epsilon<float>()))
     {
-        Point point = Point(std::cos(angle), -std::sin(angle));
+        Point point = Point((_center.getX() + std::cos(angle) * _radius), (_center.getY() - std::sin(angle) * _radius));
         polygon.add(point);
         angle += alpha;
     }

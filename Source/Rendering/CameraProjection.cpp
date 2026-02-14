@@ -12,7 +12,7 @@ std::vector<std::shared_ptr<AlgGeom::CameraProjection>> AlgGeom::CameraProjectio
 
 float AlgGeom::CameraProjection::CameraProperties::computeAspect()
 {
-	return static_cast<float>(_width) / static_cast<float>(_height);
+	return (_height == 0) ? 0.0f : static_cast<float>(_width) / static_cast<float>(_height);
 }
 
 void AlgGeom::CameraProjection::CameraProperties::computeAxes(vec3& n, vec3& u, vec3& v)

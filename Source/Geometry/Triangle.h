@@ -8,6 +8,7 @@
  */
 
 #include "Vect2d.h"
+#include "Circle.h"
 
 class Triangle
 {

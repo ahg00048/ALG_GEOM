@@ -27,9 +27,9 @@ protected:
     float getDistanceT0(Vect2d& point);
     
 	/**
-	*	@brief Obstaints the parameters t and s where both lines intersects, if they do.
+	*	@brief Obtains the parameters t and s where both lines intersects, if they do.
 	*/
-    //virtual bool intersects(Vect2d& p1, Vect2d& p2, float& t, float& s);
+    virtual bool intersects(const Vect2d& p1, const Vect2d& p2, float& t, float& s);
 
 public:    
     /**
@@ -156,5 +156,11 @@ public:
 	*	@brief Returns the area formed by the triangle composed of the current SegmentLine and the union of its bounds with p.
 	*/
 	double triangleArea2(Point& p) const { return p.triangleArea2(_orig, _dest); }      
+
+	bool intersects(const Line& r, Vect2d& res);
+
+	bool intersects(const RayLine& r, Vect2d& res);
+	
+	bool intersects(const SegmentLine& r, Vect2d& res);
 };
 

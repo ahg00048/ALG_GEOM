@@ -69,5 +69,11 @@ public:
 	*	@brief Overriding cout call.
 	*/
 	friend std::ostream& operator<<(std::ostream& os, const RayLine& ray);
+
+	bool intersects(const RayLine& r, Vect2d& v);
+
+	bool intersects(const Line& l, Vect2d& v);
+	
+	bool intersects(const SegmentLine& sg, Vect2d& v);
 };
 

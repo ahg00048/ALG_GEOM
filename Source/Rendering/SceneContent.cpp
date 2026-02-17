@@ -7,7 +7,7 @@
 #include "PointCloud.h"
 #include "RandomUtilities.h"
 
-#define INITIAL_CODE false
+#define constexpr INITIAL_CODE false
 
 // ----------------------------- BUILD YOUR SCENARIO HERE -----------------------------------
 
@@ -56,6 +56,7 @@ void AlgGeom::SceneContent::buildScenario()
     Line* line = new Line(Point(-1.0, -1.0), Point(1.0, 1.0));
     this->addNewModel((new DrawLine(*line))->setLineColor(vec4(.0f, 1.0f, .0f, 1.0f))->overrideModelName()->setLineWidth(2.0f));
 #else
+    //PR1a
     // PointCloud
     const std::string filePath = "./PointCloud.txt";
     const unsigned int cloudSize = 200;
@@ -155,6 +156,8 @@ void AlgGeom::SceneContent::buildScenario()
 
     delete pc;
     pc = nullptr;
+
+    //PR1b
 #endif
 }
 

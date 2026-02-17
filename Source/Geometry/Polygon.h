@@ -83,19 +83,19 @@ public:
 	*	@brief Checks if a line intersects with the Polygon.
 	*	@param intersection If line and Polygon intersect, then this point is the intersection. Otherwise this point is not valid.
 	*/
-	bool intersects(Line& line, Vect2d& interseccion);
+	bool intersects(const Line& line, Vect2d& intersection);
 
 	/**
 	*	@brief Checks if a rayline intersects with the Polygon.
 	*	@param intersection If rayline and Polygon intersect, then this point is the intersection. Otherwise this point is not valid.
 	*/
-	bool intersects(RayLine& ray, Vect2d& interseccion);
+	bool intersects(const RayLine& ray, Vect2d& intersection);
 
 	/**
 	*	@brief Checks if a segment intersects with the Polygon.
 	*	@param intersection If Polygon and segment intersect, then this point is the intersection. Otherwise this point is not valid.
 	*/
-	bool intersects(SegmentLine& segment, Vect2d& interseccion);
+	bool intersects(const SegmentLine& segment, Vect2d& intersection);
 
 	/**
 	*	@brief Returns the following vertex based on the specified index.

@@ -39,7 +39,7 @@ bool Line::intersects(const Line& line, Vect2d& intersection)
 	if (SegmentLine::intersects(lineOrig, lineDest, t, s))
 	{
 		intersection = getPoint(s);
-		return false;
+		return true;
 	}
 
 	return false;

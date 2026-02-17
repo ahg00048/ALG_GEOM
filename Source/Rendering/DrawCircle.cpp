@@ -7,7 +7,7 @@ AlgGeom::DrawCircle::DrawCircle(Circle& circle, uint32_t numSubdivisions): Model
 {
     Component* component = new Component;
 
-    Polygon polygon = _circle.getPointsCircle();
+    Polygon polygon = _circle.getPointsCircle(_numSubdivisions);
     size_t numVertices = polygon.getNumVertices();
 
     for (unsigned vertexIdx = 0; vertexIdx < polygon.getNumVertices(); vertexIdx++) {

@@ -30,25 +30,25 @@ public:
 	/**
 	*	@brief Distance from a point defined by 'vector' to this line.
 	*/
-	double distancePointLine(Vect2d& v);
+	double distToPoint(Vect2d& v);
 
 	/**
 	*	@brief Checks if the specified line intersects with this one.
 	*	@param intersection If both lines intersect, then this point is the intersection. Otherwise this point is not valid.
 	*/
-	virtual bool intersects(Line& line, Vect2d& intersection);
+	virtual bool intersects(const Line& line, Vect2d& intersection);
 
 	/**
 	*	@brief Checks if the specified rayline intersects with this line.
 	*	@param intersection If rayline and line intersect, then this point is the intersection. Otherwise this point is not valid.
 	*/
-	virtual bool intersects(RayLine& rayline, Vect2d& intersection);
+	virtual bool intersects(const RayLine& rayline, Vect2d& intersection);
 
 	/**
 	*	@brief Checks if the specified segment intersects with this line.
 	*	@param intersection If line and segment intersect, then this point is the intersection. Otherwise this point is not valid.
 	*/
-	virtual bool intersects(SegmentLine& segment, Vect2d& intersection);
+	virtual bool intersects(const SegmentLine& segment, Vect2d& intersection);
 
 	/**
 	*	@brief Checks if a segment line generates an incorrect intersection.

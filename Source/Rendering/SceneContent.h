@@ -4,6 +4,7 @@
 #include "AABB.h"
 #include "ApplicationState.h"
 #include "Camera.h"
+#include "Point.h"
 #include "Model3D.h"
 
 namespace AlgGeom
@@ -22,5 +23,11 @@ namespace AlgGeom
 		void addNewModel(Model3D* model);
 		void buildScenario();
 		Model3D* getModel(Model3D::Component* component);
+	
+		// Practices 
+		void pr1A();
+		void pr1B();
+
+		Point randomPointInUnitDisk(float diskR);
 	};
 }

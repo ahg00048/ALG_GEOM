@@ -30,7 +30,7 @@ public:
 	/**
 	*	@brief Distance from a point defined by 'vector' to this rayline.
 	*/
-	float distanceToPoint(Vect2d& vector);
+	float distToPoint(Vect2d& vector);
 
 	/**
 	*	@brief Checks if this rayline intersects with a segment in an incorrect way.
@@ -69,5 +69,11 @@ public:
 	*	@brief Overriding cout call.
 	*/
 	friend std::ostream& operator<<(std::ostream& os, const RayLine& ray);
+
+	bool intersects(const RayLine& r, Vect2d& v);
+
+	bool intersects(const Line& l, Vect2d& v);
+	
+	bool intersects(const SegmentLine& sg, Vect2d& v);
 };
 

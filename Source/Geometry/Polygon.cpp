@@ -78,15 +78,36 @@ Vertex Polygon::getVertexAt(int position)
 	}
 }
 
-bool Polygon::intersects(Line& line, Vect2d& interseccion)
+bool Polygon::intersects(const Line& line, Vect2d& intersection)
 {
-	// XXXX
+	for(int i = 0; i < getNumVertices(); i++) 
+	{
+		if (getEdge(i).intersects(line, intersection))
+			return true;
+	}
+
 	return false;
 }
 
-bool Polygon::intersects(RayLine& ray, Vect2d& interseccion)
+bool Polygon::intersects(const RayLine& ray, Vect2d& intersection)
 {
-	// XXXX
+	for (int i = 0; i < getNumVertices(); i++)
+	{
+		if (getEdge(i).intersects(ray, intersection))
+			return true;
+	}
+
+	return false;
+}
+
+bool Polygon::intersects(const SegmentLine& segment, Vect2d& intersection)
+{
+	for (int i = 0; i < getNumVertices(); i++)
+	{
+		if (getEdge(i).intersects(segment, intersection))
+			return true;
+	}
+
 	return false;
 }
 
@@ -100,10 +121,6 @@ bool Polygon::convex()
 	return true;
 }
 
-bool Polygon::intersects(SegmentLine& segment, Vect2d& interseccion)
-{
-	return false;
-}
 
 Vertex Polygon::next(int index)
 {

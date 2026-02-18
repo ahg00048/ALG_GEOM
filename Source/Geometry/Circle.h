@@ -9,10 +9,48 @@
 
 #include "Point.h"
 #include "Polygon.h"
-
+#include "Line.h"
 
 class Circle 
 {
+public:
+    enum RelationCircles
+    {
+        CONCENTRIC = 0,
+        EXTERNAL, 
+        INTERNAL,
+        SECANT,
+        INTERIOR_TANG,
+        EXTERNAL_TANG
+    };
+
+    enum RelationCircleLine
+    {
+        INTERSECT = 0,
+        TANGENTS,
+        NO_INTERSECT
+    };
+
+    static std::string lineRelToString(Circle::RelationCircleLine rel)
+    {
+        std::string strs[3] = { "INTERSECT",
+                                "TANGENTS",
+                                "NO_INTERSECT" };
+
+        return strs[rel];
+    }
+
+    static std::string circleRelToString(Circle::RelationCircles rel)
+    {
+        std::string strs[6] = { "CONCENTRIC",
+                                "EXTERNAL",
+                                "INTERNAL",
+                                "SECANT",
+                                "INTERIOR_TANG",
+                                "EXTERNAL_TANG" };
+
+        return strs[rel];
+    }
 protected:
     Point       _center;             
     double      _radius;
@@ -54,5 +92,15 @@ public:
     *	@brief Assignment operator (override).
     */
     virtual Circle& operator=(const Circle& circle);
+
+    const RelationCircles relationCircle(const Circle& c) const;
+
+    const RelationCircleLine relationLine(Line& l) const;
+
+    const RelationCircleLine intersect(Line& l, Vect2d& v1, Vect2d& v2) const;
+
+    const RelationCircleLine intersect(SegmentLine& sg, Vect2d& v1, Vect2d& v2) const;
+
+    const RelationCircleLine intersect(RayLine& r, Vect2d& v1, Vect2d& v2) const;
 };
 

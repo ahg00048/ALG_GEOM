@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "SegmentLine.h"
+#include "Line.h"
+#include "RayLine.h"
 
 // Public methods
 
@@ -34,6 +36,32 @@ SegmentLine & SegmentLine::operator=(const SegmentLine & segment)
 	return *this;
 }
 
+bool SegmentLine::intersects(const Vect2d& p1, const Vect2d& p2, float& t, float& s) 
+{
+	double Xcd = p2.getX() - p1.getX();
+	double Ycd = p2.getY() - p1.getY();
+
+	double Xab = _dest.getX() - _orig.getX();
+	double Yab = _dest.getY() - _orig.getY();
+
+	double Xac = p1.getX() - _orig.getX();
+	double Yac = p1.getY() - _orig.getY();
+
+	double denominator = (Xcd * Yab - Xab * Ycd);
+
+	if (BasicGeometry::equal(denominator, 0.0))
+		return false;
+
+	s = (Xcd * Yac - Xac * Ycd) /
+		(Xcd * Yab - Xab * Ycd);
+
+	t = (Xab * Yac - Xac * Yab) /
+		(Xcd * Yab - Xab * Ycd);
+
+	return true;
+}
+
+
 bool SegmentLine::segmentIntersection(SegmentLine& l)
 {
 	Point lOrig = l.getA();
@@ -53,9 +81,17 @@ bool SegmentLine::distinct(SegmentLine & segment)
 	return !equal(segment);
 }
 
-float SegmentLine::distPointSegment(Vect2d& vector)
+float SegmentLine::distToPointSeg(Vect2d& vector)
 {
-	return 0.0f;
+	float distance = 0.0f;
+	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());
+	Vect2d pa(vector.getX() - _orig.getX(), vector.getY() - _orig.getY());
+	float t = (d.dot(pa) /
+			   d.getModule());
+
+	return (t <= 0) ?			pa.getModule() : 
+			(0 < t && t < 1) ? (vector - (d.scalarMult(t) + _orig)).getModule() : 
+								(vector - _dest).getModule();
 }
 
 bool SegmentLine::equal(SegmentLine & segment)
@@ -90,6 +126,63 @@ double SegmentLine::slope()
     return (BasicGeometry::equal(_dest.getX(), _orig.getX())) ? INFINITY : (_dest.getY() - _dest.getY())/(_dest.getX() - _orig.getX());
 }
 
+bool SegmentLine::intersects(const Line& r, Vect2d& res) 
+{
+	float s = 0;
+	float t = 0;
+
+	Vect2d lineOrig = r.getA();
+	Vect2d lineDest = r.getB();
+
+	if (intersects(lineOrig, lineDest, t, s) && 
+		0 <= s && s <= 1)
+	{
+		res = getPoint(s);
+		return true;
+	}
+
+	return false;
+}
+
+bool SegmentLine::intersects(const RayLine& r, Vect2d& res) 
+{
+	float s = 0;
+	float t = 0;
+
+	Vect2d lineOrig = r.getA();
+	Vect2d lineDest = r.getB();
+
+	if (intersects(lineOrig, lineDest, t, s) && 
+		0 <= t && 
+		0 <= s && s <= 1)
+	{
+		res = getPoint(s);
+		return true;
+	}
+
+	return false;
+}
+
+bool SegmentLine::intersects(const SegmentLine& r, Vect2d& res)
+{
+	float s = 0;
+	float t = 0;
+
+	Vect2d lineOrig = r.getA();
+	Vect2d lineDest = r.getB();
+
+	if (intersects(lineOrig, lineDest, t, s) && 
+		(0 <= s && s <= 1) && 
+		(0 <= t && t <= 1))
+	{
+		res = getPoint(s);
+		return true;
+	}
+
+	return false;
+}
+
+
 // Protected methods
 
 std::ostream& operator<<(std::ostream& os, const SegmentLine& segment)
@@ -103,5 +196,9 @@ std::ostream& operator<<(std::ostream& os, const SegmentLine& segment)
 
 float SegmentLine::getDistanceT0(Vect2d& point)
 {
-	return 0.0f;
+	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());
+	Vect2d pa = point - _orig;
+
+	return (d.dot(pa) /
+		d.getModule());
 }

@@ -1,13 +1,15 @@
 #include "stdafx.h"
 #include "SceneContent.h"
 
-#include "ChronoUtilities.h"
 #include "InclDraw2D.h"
 #include "InclGeom2D.h"
 #include "PointCloud.h"
 #include "RandomUtilities.h"
+#include <format>
+#include <string>
 
 #define INITIAL_CODE false
+#define PR1_A true
 
 // ----------------------------- BUILD YOUR SCENARIO HERE -----------------------------------
 
@@ -55,106 +57,10 @@ void AlgGeom::SceneContent::buildScenario()
     // Line
     Line* line = new Line(Point(-1.0, -1.0), Point(1.0, 1.0));
     this->addNewModel((new DrawLine(*line))->setLineColor(vec4(.0f, 1.0f, .0f, 1.0f))->overrideModelName()->setLineWidth(2.0f));
+#elif PR1_A
+    pr1A();
 #else
-    // PointCloud
-    const std::string filePath = "./PointCloud.txt";
-    const unsigned int cloudSize = 200;
-    
-    PointCloud* pc = new PointCloud(cloudSize, 5.0f, 5.0f);
-    pc->save(filePath);
-    this->addNewModel((new DrawPointCloud(*pc))->setPointColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName()->setLineWidth(2.0f));
-
-    // Segments
-    SegmentLine* sgl1 = new SegmentLine();
-    SegmentLine* sgl2 = new SegmentLine();
-   
-    do 
-    {
-        sgl1->setA(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
-        sgl1->setB(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
-
-        sgl2->setA(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
-        sgl2    ->setB(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
-    } while (!sgl1->segmentIntersection(*sgl2));
-
-    this->addNewModel((new DrawSegment(*sgl1))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
-    this->addNewModel((new DrawSegment(*sgl2))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
-    delete sgl1;
-    delete sgl2;
-    sgl1 = nullptr;
-    sgl2 = nullptr;
-
-    // Ray and line
-    Point a(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
-    Point b(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
-
-    Line* l = new Line(a, b);
-    
-    a.set(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
-    b.set(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
-    
-    RayLine* rl = new RayLine(a, b);
-
-    this->addNewModel((new DrawLine(*l))->setLineColor(vec4(0.0f, 0.0f, 1.0f, 1.0f))->overrideModelName()->setLineWidth(5.0f));
-    this->addNewModel((new DrawRay(*rl))->setLineColor(vec4(0.0f, 1.0f, 0.0f, 1.0f))->overrideModelName()->setLineWidth(5.0f));
-
-    delete l;
-    delete rl;
-    l = nullptr;
-    rl = nullptr;
-
-    // Polygon
-    Polygon* p = new Polygon();
-    for(int i = 0; i < 5; i++)
-        p->add(Point());
-    int pSize = p->getNumVertices();
-    bool pCreated;
-    do
-    {
-        pCreated = true;
-
-        for(int i = 0; i < 5; i++) 
-        {
-            Vertex v = pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1));
-            p->set(v, i);
-        }
-        
-        for (int i = 0; i < pSize; i++)
-        {
-            SegmentLine psgl1 = p->getEdge(i);
-            for (int j = 0; j < pSize; j++)
-            {
-                if (j == i) continue;
-                SegmentLine psgl2 = p->getEdge(i + 1);
-                if(psgl1.segmentIntersection(psgl2)) pCreated = false;
-            }
-        }
-
-    } while (!pCreated);
-
-    this->addNewModel((new DrawPolygon(*p))->setTriangleColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName());
-    delete p;
-    p = nullptr;
-
-    // Triangle and its circles
-
-    Vect2d vec1 = Vect2d(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
-    Vect2d vec2 = Vect2d(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
-    Vect2d vec3 = Vect2d(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
-    Triangle* tr = new Triangle(vec1, vec2, vec3);
-
-    Circle circ = tr->getCirumscribed();
-    Circle incs = tr->getInscribed();
-    this->addNewModel((new DrawTriangle(*tr))->setLineColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName()->setLineWidth(2.0f));
-    this->addNewModel((new DrawCircle(circ, 30))->setLineColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName()->setLineWidth(3.0f));
-    this->addNewModel((new DrawCircle(incs, 30))->setLineColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName()->setLineWidth(3.0f));
-    delete tr;
-    tr = nullptr;
-
-    // Free resources
-
-    delete pc;
-    pc = nullptr;
+    pr1B();
 #endif
 }
 
@@ -192,4 +98,469 @@ AlgGeom::Model3D* AlgGeom::SceneContent::getModel(Model3D::Component* component)
 	}
 
 	return nullptr;
+}
+
+//---------------------------------------------------------------------------------------------------------------
+
+void AlgGeom::SceneContent::pr1A()
+{
+    //PR1a
+ 
+    // PointCloud
+    const std::string filePath = "./PointCloud.txt";
+    const unsigned int cloudSize = 200;
+
+    PointCloud* pc = new PointCloud(cloudSize, 5.0f, 5.0f);
+    pc->save(filePath);
+    this->addNewModel((new DrawPointCloud(*pc))->setPointColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName()->setLineWidth(2.0f));
+
+    // Segments
+    SegmentLine* sgl1 = new SegmentLine();
+    SegmentLine* sgl2 = new SegmentLine();
+    do
+    {
+        sgl1->setA(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
+        sgl1->setB(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
+
+        sgl2->setA(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
+        sgl2->setB(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
+    } while (!sgl1->segmentIntersection(*sgl2));
+
+    this->addNewModel((new DrawSegment(*sgl1))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
+    this->addNewModel((new DrawSegment(*sgl2))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
+    delete sgl1;
+    delete sgl2;
+    sgl1 = nullptr;
+    sgl2 = nullptr;
+
+    // Ray and line
+    Point a(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
+    Point b(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
+
+    Line* l = new Line(a, b);
+
+    a.set(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
+    b.set(RandomUtilities::getUniformRandom(-5.0f, 5.0f), RandomUtilities::getUniformRandom(-5.0f, 5.0f));
+
+    RayLine* rl = new RayLine(a, b);
+
+    this->addNewModel((new DrawLine(*l))->setLineColor(vec4(0.0f, 0.0f, 1.0f, 1.0f))->overrideModelName()->setLineWidth(5.0f));
+    this->addNewModel((new DrawRay(*rl))->setLineColor(vec4(0.0f, 1.0f, 0.0f, 1.0f))->overrideModelName()->setLineWidth(5.0f));
+
+    delete l;
+    delete rl;
+    l = nullptr;
+    rl = nullptr;
+
+    // Polygon
+    Polygon* p = new Polygon();
+    int pSize = 5;
+    for (int i = 0; i < pSize; i++)
+        p->add(Point());
+    bool pCreated;
+
+    do
+    {
+        pCreated = true;
+
+        for (int i = 0; i < 5; i++)
+        {
+            Vertex v = pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1));
+            p->set(v, i);
+        }
+
+        for (int i = 0; i < pSize; i++)
+        {
+            SegmentLine psgl1 = p->getEdge(i);
+            for (int j = 0; j < pSize; j++)
+            {
+                if (j == i) continue;
+                SegmentLine psgl2 = p->getEdge(j);
+                if (psgl1.segmentIntersection(psgl2)) pCreated = false;
+            }
+        }
+
+    } while (!pCreated);
+
+    this->addNewModel((new DrawPolygon(*p))->setTriangleColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName());
+
+    delete p;
+    p = nullptr;
+
+    // Triangle and its circles
+
+    Vect2d* vec1 = new Vect2d(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
+    Vect2d* vec2 = new Vect2d(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
+    Vect2d* vec3 = new Vect2d(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
+    Triangle* tr = new Triangle(*vec1, *vec2, *vec3);
+
+    delete vec1;
+    delete vec2;
+    delete vec3;
+    vec1 = nullptr;
+    vec2 = nullptr;
+    vec3 = nullptr;
+
+    Circle* circ = new Circle(tr->getCirumscribed());
+    Circle* incs = new Circle(tr->getInscribed());
+    this->addNewModel((new DrawTriangle(*tr))->setLineColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawCircle(*circ))->setLineColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName()->setLineWidth(3.0f));
+    this->addNewModel((new DrawCircle(*incs))->setLineColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName()->setLineWidth(3.0f));
+    delete tr;
+    delete circ;
+    delete incs;
+    tr = nullptr;
+    circ = nullptr;
+    incs = nullptr;
+
+    delete p;
+    p = nullptr;
+    delete pc;
+    pc = nullptr;
+}
+
+void AlgGeom::SceneContent::pr1B() 
+{
+    //PR1b    
+    float axisDepth = 1.0f;
+
+    // 1 Create a set of lines and a polygon making specific intersections
+    vec4 rgbLTypes[4] = { {1.0f, 1.0f, 0.0f, 1.0f},     // Brown - line
+                          {1.0f, 0.0f, 1.0f, 1.0f},     // Purple - ray
+                          {0.0f, 1.0f, 1.0f, 1.0f},     // Aqua - segment
+                          {0.0f, 0.5f, 0.0f, 1.0f} };   // Dark green - polygon
+    float interPointSize = 10.0f;
+
+
+    Line* l1 = new Line(randomPointInUnitDisk(axisDepth), 
+                        randomPointInUnitDisk(axisDepth));
+    Line* l2 = new Line(Point(), Point());
+
+    Vect2d intersectionPoint;
+    Vect2d auxIntersection;
+    do
+    {
+        l2->setA(randomPointInUnitDisk(axisDepth));
+        l2->setB(randomPointInUnitDisk(axisDepth));
+    } while (!l1->intersects(*l2, intersectionPoint));
+
+    // Draw l1, l2 and its intersection
+    this->addNewModel((new DrawLine(*l1))->setLineColor(rgbLTypes[0])->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawLine(*l2))->setLineColor(rgbLTypes[0])->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(vec4(1.0f, 1.0f, 1.0f, 1.0f))->overrideModelName()->setPointSize(interPointSize));
+
+    SegmentLine* sg1 = new SegmentLine();
+    do
+    {
+        sg1->setA(randomPointInUnitDisk(axisDepth));
+        sg1->setB(randomPointInUnitDisk(axisDepth));
+    } 
+    while (sg1->intersects(*l1, intersectionPoint) ||
+           sg1->intersects(*l2, intersectionPoint));
+   
+    SegmentLine* sg2 = new SegmentLine();
+    do
+    {
+        sg2->setA(randomPointInUnitDisk(axisDepth));
+        sg2->setB(randomPointInUnitDisk(axisDepth));
+    } while (!sg2->intersects(*sg1, intersectionPoint) ||
+              sg2->intersects(*l1, auxIntersection) ||
+              sg2->intersects(*l2, auxIntersection));
+
+    // Draw sg1, sg2 and its intersection
+    this->addNewModel((new DrawSegment(*sg1))->setLineColor(rgbLTypes[2])->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawSegment(*sg2))->setLineColor(rgbLTypes[2])->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(vec4(1.0f, 1.0f, 1.0f, 1.0f))->overrideModelName()->setPointSize(interPointSize));
+
+    RayLine* r1 = new RayLine(Point(), Point());
+    do
+    {
+        r1->setA(randomPointInUnitDisk(axisDepth));
+        r1->setB(randomPointInUnitDisk(axisDepth));
+    } while (!r1->intersects(*sg1, intersectionPoint) ||
+              r1->intersects(*l1, auxIntersection) || 
+              r1->intersects(*l2, auxIntersection) || 
+              r1->intersects(*sg2, auxIntersection));
+
+    // Draw r1 and its intersection
+    this->addNewModel((new DrawRay(*r1))->setLineColor(rgbLTypes[1])->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(vec4(1.0f, 1.0f, 1.0f, 1.0f))->overrideModelName()->setPointSize(interPointSize));
+
+    int pSize = 4;
+    Polygon* p = new Polygon;
+    for (int i = 0; i < pSize; i++)
+        p->add(Point());
+
+    bool pCreated = true;
+    bool valid = false;
+    do
+    {
+        valid = false;
+        pCreated = true;
+
+        for (int i = 0; i < pSize; i++)
+        {
+            Vertex v = randomPointInUnitDisk(axisDepth);
+            p->set(v, i);
+        }
+
+        for (int i = 0; i < pSize; i++)
+        {
+            SegmentLine sgp = p->getEdge(i);
+            if (p->getEdge(i).intersects(*l1, intersectionPoint) && 
+                !(sgp.intersects(*l2, auxIntersection) ||
+                  sgp.intersects(*sg1, auxIntersection) ||
+                  sgp.intersects(*sg2, auxIntersection) ||
+                  sgp.intersects(*r1, auxIntersection)))
+                valid = true;
+
+            for (int j = 0; j < pSize; j++)
+            {
+                if (j == i) continue;
+
+                SegmentLine sgpAux = p->getEdge(j);
+                if (sgp.segmentIntersection(sgpAux) ||
+                    sgp.intersects(*l2, auxIntersection) || 
+                    sgp.intersects(*sg1, auxIntersection) ||
+                    sgp.intersects(*sg2, auxIntersection) ||
+                    sgp.intersects(*r1, auxIntersection))
+                    
+                    pCreated = false;
+            }
+        }
+    } while (!pCreated || !valid);
+
+    this->addNewModel((new DrawPolygon(*p))->setLineColor(rgbLTypes[3])->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(vec4(1.0f, 1.0f, 1.0f, 1.0f))->overrideModelName()->setPointSize(interPointSize));
+
+    RayLine* r2 = new RayLine(Point(), Point());
+    do
+    {
+        pCreated = false;
+        r2->setA(randomPointInUnitDisk(axisDepth));
+        r2->setB(randomPointInUnitDisk(axisDepth));
+
+        for (int i = 0; i < pSize; i++)
+        {
+            if (p->getEdge(i).intersects(*r2, intersectionPoint))
+                pCreated = true;
+        }
+    } while (!pCreated ||
+        r2->intersects(*l1, auxIntersection) ||
+        r2->intersects(*l2, auxIntersection) ||
+        r2->intersects(*sg1, auxIntersection) ||
+        r2->intersects(*sg2, auxIntersection) ||
+        r2->intersects(*r1, auxIntersection));
+
+    this->addNewModel((new DrawRay(*r2))->setLineColor(rgbLTypes[1])->overrideModelName()->setLineWidth(2.0f));
+    this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(vec4(1.0f, 1.0f, 1.0f, 1.0f))->overrideModelName()->setPointSize(interPointSize));
+
+    // 2 Distance between each polygon vertex and the lines
+
+    vec4 rgbPoint[4] = { {0.0f, 0.0f, 1.0f, 1.0f},     // 1st vertex blue
+                            {0.0f, 1.0f, 0.0f, 1.0f},       // 2st vertex green
+                            {1.0f, 0.0f, 0.0f, 1.0f},       // 3st vertex red
+                            {0.0f, 0.0f, 0.0f, 1.0f} };     // 4st vertex black
+
+    constexpr const char* fmt = " {} -> {} {}\n";
+
+    std::cout << "\nEJERCICIO 2:\n"
+        " 0: Azul\n 1: Verde\n 2: Rojo\n 3: Negro\n\n";
+
+    for (int i = 0; i < p->getNumVertices(); i++)
+    {
+        Vect2d pPoint = p->getVertexAt(i);
+
+        std::cout << std::format(fmt, i, "l1", l1->distToPoint(pPoint));
+        std::cout << std::format(fmt, i, "l2", l2->distToPoint(pPoint));      
+        std::cout << std::format(fmt, i, "sg1", sg1->distToPointSeg(pPoint));
+        std::cout << std::format(fmt, i, "sg2", sg2->distToPointSeg(pPoint));        
+        std::cout << std::format(fmt, i, "r1", r1->distToPoint(pPoint));
+        std::cout << std::format(fmt, i, "r2", r2->distToPoint(pPoint)) << std::endl;
+
+        this->addNewModel((new DrawPoint(pPoint))->overrideModelName()->setPointColor(rgbPoint[i])->setPointSize(interPointSize));
+    }
+    
+    // 3 Create two circles and determine its relationship between them, as well with the lines
+    // Each pos of the array corresponds to a color and a circle rel based on the enum value
+
+    vec4 rgbCircleLine[3] = { {0.0f, 0.0f, 1.0f, 1.0f},
+                            {0.0f, 1.0f, 0.0f, 1.0f},
+                            {0.0f, 1.0f, 1.0f, 1.0f} };
+
+    Circle* c1 = new Circle(randomPointInUnitDisk(axisDepth), RandomUtilities::getUniformRandom(0.01f, 1.0f));
+    Circle* c2 = new Circle(randomPointInUnitDisk(axisDepth), RandomUtilities::getUniformRandom(0.01f, 1.0f));
+
+    Circle::RelationCircles c1c2 = c1->relationCircle(*c2);
+
+    Circle::RelationCircleLine c1l1 = c1->relationLine(*l1);
+    Circle::RelationCircleLine c1l2 = c1->relationLine(*l2);
+
+    Circle::RelationCircleLine c2l1 = c2->relationLine(*l1);
+    Circle::RelationCircleLine c2l2 = c2->relationLine(*l2);
+
+    std::cout << "\nEJERCICIO 3:\n";
+    std::cout << " C1 - C2: " << Circle::circleRelToString(c1c2) << std::endl;
+    std::cout << " C1 -> l1: " << Circle::lineRelToString(c1l1) << std::endl;
+    std::cout << " C1 -> l2: " << Circle::lineRelToString(c1l2) << std::endl;
+    std::cout << " C2 -> l1: " << Circle::lineRelToString(c2l1) << std::endl;
+    std::cout << " C2 -> l2: " << Circle::lineRelToString(c2l2) << std::endl;
+
+    this->addNewModel((new DrawCircle(*c1))->setLineColor(rgbCircleLine[0])->overrideModelName()->setLineWidth(3.0f));
+    this->addNewModel((new DrawCircle(*c2))->setLineColor(rgbCircleLine[1])->overrideModelName()->setLineWidth(3.0f));
+
+    // 4 Intersection points will be drawn in white
+    
+    // c1 and c2 with l1
+    
+    Circle::RelationCircleLine cRel = c1->intersect(*l1, intersectionPoint, auxIntersection);
+    if(cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if(cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    cRel = c2->intersect(*l1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with l2
+
+    cRel = c1->intersect(*l2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    cRel = c2->intersect(*l2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with r1
+
+    Point testValue(INFINITY, INFINITY);
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*r1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT && 
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*r1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT && 
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with r2
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*r2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT && 
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*r2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with sg1
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*sg1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*sg1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with sg2
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*sg2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*sg2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with p
+
+    for (int i = 0; i < pSize; i++)
+    {
+        SegmentLine sgp = p->getEdge(i);
+
+        auxIntersection.set(INFINITY, INFINITY);
+        cRel = c1->intersect(sgp, intersectionPoint, auxIntersection);
+        if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+            this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+        if (cRel == Circle::RelationCircleLine::INTERSECT &&
+            !auxIntersection.equal(testValue))
+            this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+        auxIntersection.set(INFINITY, INFINITY);
+        cRel = c2->intersect(sgp, intersectionPoint, auxIntersection);
+        if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+            this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+        if (cRel == Circle::RelationCircleLine::INTERSECT &&
+            !auxIntersection.equal(testValue))
+            this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    }
+
+    // Free resources
+
+    delete l1;
+    l1 = nullptr;
+    delete l2;
+    l2 = nullptr;
+    delete r1;
+    r1 = nullptr;
+    delete r2;
+    r2 = nullptr;
+    delete sg1;
+    sg1 = nullptr;
+    delete sg2;
+    sg2 = nullptr;
+    delete p;
+    p = nullptr;
+    delete c1;
+    c1 = nullptr;
+    delete c2;
+    c2 = nullptr;
+}
+
+Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)
+{
+    vec3 vect = RandomUtilities::getUniformRandomInUnitDisk();
+
+    return Point(vect.x * diskR, vect.y * diskR);
 }

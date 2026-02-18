@@ -17,27 +17,67 @@ Line::~Line()
 {
 }
 
-double Line::distancePointLine(Vect2d& v)
+double Line::distToPoint(Vect2d& v)
 {
-	// XXXX
-	return 0.0;
+	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());
+	Vect2d pa = v - _orig;
+
+	float t = (d.dot(pa) /
+		d.getModule());
+
+	return (v - (d.scalarMult(t) + _orig)).getModule();
 }
 
-bool Line::intersects(Line& line, Vect2d& intersection)
+bool Line::intersects(const Line& line, Vect2d& intersection)
 {
-	// XXXX
+	float s = 0;
+	float t = 0;
+
+	Vect2d lineOrig = line.getA();
+	Vect2d lineDest = line.getB();
+
+	if (SegmentLine::intersects(lineOrig, lineDest, t, s))
+	{
+		intersection = getPoint(s);
+		return true;
+	}
+
 	return false;
 }
 
-bool Line::intersects(RayLine& rayline, Vect2d& intersection)
+bool Line::intersects(const RayLine& rayline, Vect2d& intersection)
 {
-	// XXXX
+	float s = 0;
+	float t = 0;
+
+	Vect2d lineOrig = rayline.getA();
+	Vect2d lineDest = rayline.getB();
+
+	if (SegmentLine::intersects(lineOrig, lineDest, t, s) && 
+					0 <= t)
+	{
+		intersection = getPoint(s);
+		return true;
+	}
+
 	return false;
 }
 
-bool Line::intersects(SegmentLine& segment, Vect2d& intersection)
+bool Line::intersects(const SegmentLine& segment, Vect2d& intersection)
 {
-	// XXXX
+	float s = 0;
+	float t = 0;
+
+	Vect2d lineOrig = segment.getA();
+	Vect2d lineDest = segment.getB();
+
+	if (SegmentLine::intersects(lineOrig, lineDest, t, s) && 
+					(0 <= t && t <= 1))
+	{
+		intersection = getPoint(s);
+		return true;
+	}
+
 	return false;
 }
 

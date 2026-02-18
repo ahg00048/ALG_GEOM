@@ -135,7 +135,7 @@ bool SegmentLine::intersects(const Line& r, Vect2d& res)
 	Vect2d lineDest = r.getB();
 
 	if (intersects(lineOrig, lineDest, t, s) && 
-		0 <= s && s <= t)
+		0 <= s && s <= 1)
 	{
 		res = getPoint(s);
 		return true;

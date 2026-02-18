@@ -65,7 +65,7 @@ const Circle::RelationCircles Circle::relationCircle(const Circle& c) const
 const Circle::RelationCircleLine Circle::relationLine(Line& l) const
 {
     Vect2d vCenter = _center;
-    double dist = l.distancePointLine(vCenter);
+    double dist = l.distToPoint(vCenter);
 
     if (BasicGeometry::equal(dist, _radius))
         return Circle::RelationCircleLine::TANGENTS;
@@ -84,7 +84,7 @@ const Circle::RelationCircleLine Circle::intersect(Line& l, Vect2d& v1, Vect2d& 
 
     double delta = pow(d.dot(diff), 2) - pow(d.getModule(), 2) * (pow(diff.getModule(), 2) - pow(_radius, 2));
     double t1 = -(d.dot(diff) + sqrt(delta)) / pow(d.getModule(), 2);
-    double t2 = -(d.dot(diff) + sqrt(delta)) / pow(d.getModule(), 2);
+    double t2 = -(d.dot(diff) - sqrt(delta)) / pow(d.getModule(), 2);
 
     if (BasicGeometry::equal(delta, 0))
     {
@@ -110,7 +110,7 @@ const Circle::RelationCircleLine Circle::intersect(SegmentLine& sg, Vect2d& v1, 
 
     double delta = pow(d.dot(diff), 2) - pow(d.getModule(), 2) * (pow(diff.getModule(), 2) - pow(_radius, 2));
     double t1 = -(d.dot(diff) + sqrt(delta)) / pow(d.getModule(), 2);
-    double t2 = -(d.dot(diff) + sqrt(delta)) / pow(d.getModule(), 2);
+    double t2 = -(d.dot(diff) - sqrt(delta)) / pow(d.getModule(), 2);
 
     bool insideSgT1 = (t1 <= 1 && t1 >= 0);
     bool insideSgT2 = (t2 <= 1 && t2 >= 0);
@@ -148,7 +148,7 @@ const Circle::RelationCircleLine Circle::intersect(RayLine& r, Vect2d& v1, Vect2
 
     double delta = pow(d.dot(diff), 2) - pow(d.getModule(), 2) * (pow(diff.getModule(), 2) - pow(_radius, 2));
     double t1 = -(d.dot(diff) + sqrt(delta)) / pow(d.getModule(), 2);
-    double t2 = -(d.dot(diff) + sqrt(delta)) / pow(d.getModule(), 2);
+    double t2 = -(d.dot(diff) - sqrt(delta)) / pow(d.getModule(), 2);
 
     v1 = r.getPoint(t1);
     v2 = r.getPoint(t2);

@@ -81,7 +81,7 @@ bool SegmentLine::distinct(SegmentLine & segment)
 	return !equal(segment);
 }
 
-float SegmentLine::distPointSegment(Vect2d& vector)
+float SegmentLine::distToPointSeg(Vect2d& vector)
 {
 	float distance = 0.0f;
 	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());
@@ -196,5 +196,9 @@ std::ostream& operator<<(std::ostream& os, const SegmentLine& segment)
 
 float SegmentLine::getDistanceT0(Vect2d& point)
 {
-	return 0.0f;
+	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());
+	Vect2d pa = point - _orig;
+
+	return (d.dot(pa) /
+		d.getModule());
 }

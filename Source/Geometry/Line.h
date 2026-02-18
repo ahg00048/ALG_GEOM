@@ -30,7 +30,7 @@ public:
 	/**
 	*	@brief Distance from a point defined by 'vector' to this line.
 	*/
-	double distancePointLine(Vect2d& v);
+	double distToPoint(Vect2d& v);
 
 	/**
 	*	@brief Checks if the specified line intersects with this one.

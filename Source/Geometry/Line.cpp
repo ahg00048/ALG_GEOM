@@ -17,7 +17,7 @@ Line::~Line()
 {
 }
 
-double Line::distancePointLine(Vect2d& v)
+double Line::distToPoint(Vect2d& v)
 {
 	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());
 	Vect2d pa = v - _orig;

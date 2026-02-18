@@ -1,15 +1,15 @@
 #include "stdafx.h"
 #include "SceneContent.h"
 
-#include "ChronoUtilities.h"
 #include "InclDraw2D.h"
 #include "InclGeom2D.h"
-#include <thread>
 #include "PointCloud.h"
 #include "RandomUtilities.h"
+#include <format>
+#include <string>
 
-#define constexpr INITIAL_CODE false
-#define PR1_A false
+#define INITIAL_CODE false
+#define PR1_A true
 
 // ----------------------------- BUILD YOUR SCENARIO HERE -----------------------------------
 
@@ -229,7 +229,7 @@ void AlgGeom::SceneContent::pr1B()
                           {1.0f, 0.0f, 1.0f, 1.0f},     // Purple - ray
                           {0.0f, 1.0f, 1.0f, 1.0f},     // Aqua - segment
                           {0.0f, 0.5f, 0.0f, 1.0f} };   // Dark green - polygon
-    float interPointSize = 5.0f;
+    float interPointSize = 10.0f;
 
 
     Line* l1 = new Line(randomPointInUnitDisk(axisDepth), 
@@ -357,22 +357,184 @@ void AlgGeom::SceneContent::pr1B()
 
     // 2 Distance between each polygon vertex and the lines
 
+    vec4 rgbPoint[4] = { {0.0f, 0.0f, 1.0f, 1.0f},     // 1st vertex blue
+                            {0.0f, 1.0f, 0.0f, 1.0f},       // 2st vertex green
+                            {1.0f, 0.0f, 0.0f, 1.0f},       // 3st vertex red
+                            {0.0f, 0.0f, 0.0f, 1.0f} };     // 4st vertex black
 
+    constexpr const char* fmt = " {} -> {} {}\n";
 
+    std::cout << "\nEJERCICIO 2:\n"
+        " 0: Azul\n 1: Verde\n 2: Rojo\n 3: Negro\n\n";
+
+    for (int i = 0; i < p->getNumVertices(); i++)
+    {
+        Vect2d pPoint = p->getVertexAt(i);
+
+        std::cout << std::format(fmt, i, "l1", l1->distToPoint(pPoint));
+        std::cout << std::format(fmt, i, "l2", l2->distToPoint(pPoint));      
+        std::cout << std::format(fmt, i, "sg1", sg1->distToPointSeg(pPoint));
+        std::cout << std::format(fmt, i, "sg2", sg2->distToPointSeg(pPoint));        
+        std::cout << std::format(fmt, i, "r1", r1->distToPoint(pPoint));
+        std::cout << std::format(fmt, i, "r2", r2->distToPoint(pPoint)) << std::endl;
+
+        this->addNewModel((new DrawPoint(pPoint))->overrideModelName()->setPointColor(rgbPoint[i])->setPointSize(interPointSize));
+    }
+    
     // 3 Create two circles and determine its relationship between them, as well with the lines
     // Each pos of the array corresponds to a color and a circle rel based on the enum value
 
-    float rgbCircleRel[6][3] = { {0.0f, 0.0f, 1.0f},
-                            {0.0f, 1.0f, 0.0f},
-                            {0.0f, 1.0f, 1.0f},
-                            {1.0f, 0.0f, 0.0f},
-                            {1.0f, 0.0f, 1.0f},
-                            {1.0f, 1.0f, 0.0f} };
+    vec4 rgbCircleLine[3] = { {0.0f, 0.0f, 1.0f, 1.0f},
+                            {0.0f, 1.0f, 0.0f, 1.0f},
+                            {0.0f, 1.0f, 1.0f, 1.0f} };
 
+    Circle* c1 = new Circle(randomPointInUnitDisk(axisDepth), RandomUtilities::getUniformRandom(0.01f, 1.0f));
+    Circle* c2 = new Circle(randomPointInUnitDisk(axisDepth), RandomUtilities::getUniformRandom(0.01f, 1.0f));
+
+    Circle::RelationCircles c1c2 = c1->relationCircle(*c2);
+
+    Circle::RelationCircleLine c1l1 = c1->relationLine(*l1);
+    Circle::RelationCircleLine c1l2 = c1->relationLine(*l2);
+
+    Circle::RelationCircleLine c2l1 = c2->relationLine(*l1);
+    Circle::RelationCircleLine c2l2 = c2->relationLine(*l2);
+
+    std::cout << "\nEJERCICIO 3:\n";
+    std::cout << " C1 - C2: " << Circle::circleRelToString(c1c2) << std::endl;
+    std::cout << " C1 -> l1: " << Circle::lineRelToString(c1l1) << std::endl;
+    std::cout << " C1 -> l2: " << Circle::lineRelToString(c1l2) << std::endl;
+    std::cout << " C2 -> l1: " << Circle::lineRelToString(c2l1) << std::endl;
+    std::cout << " C2 -> l2: " << Circle::lineRelToString(c2l2) << std::endl;
+
+    this->addNewModel((new DrawCircle(*c1))->setLineColor(rgbCircleLine[0])->overrideModelName()->setLineWidth(3.0f));
+    this->addNewModel((new DrawCircle(*c2))->setLineColor(rgbCircleLine[1])->overrideModelName()->setLineWidth(3.0f));
 
     // 4 Intersection points will be drawn in white
+    
+    // c1 and c2 with l1
+    
+    Circle::RelationCircleLine cRel = c1->intersect(*l1, intersectionPoint, auxIntersection);
+    if(cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if(cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
 
+    cRel = c2->intersect(*l1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
 
+    // c1 and c2 with l2
+
+    cRel = c1->intersect(*l2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    cRel = c2->intersect(*l2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT)
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with r1
+
+    Point testValue(INFINITY, INFINITY);
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*r1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT && 
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*r1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT && 
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with r2
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*r2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT && 
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*r2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with sg1
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*sg1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*sg1, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with sg2
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c1->intersect(*sg2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    auxIntersection.set(INFINITY, INFINITY);
+    cRel = c2->intersect(*sg2, intersectionPoint, auxIntersection);
+    if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+        this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    if (cRel == Circle::RelationCircleLine::INTERSECT &&
+        !auxIntersection.equal(testValue))
+        this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+    // c1 and c2 with p
+
+    for (int i = 0; i < pSize; i++)
+    {
+        SegmentLine sgp = p->getEdge(i);
+
+        auxIntersection.set(INFINITY, INFINITY);
+        cRel = c1->intersect(sgp, intersectionPoint, auxIntersection);
+        if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+            this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+        if (cRel == Circle::RelationCircleLine::INTERSECT &&
+            !auxIntersection.equal(testValue))
+            this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+
+        auxIntersection.set(INFINITY, INFINITY);
+        cRel = c2->intersect(sgp, intersectionPoint, auxIntersection);
+        if (cRel != Circle::RelationCircleLine::NO_INTERSECT)
+            this->addNewModel((new DrawPoint(intersectionPoint))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+        if (cRel == Circle::RelationCircleLine::INTERSECT &&
+            !auxIntersection.equal(testValue))
+            this->addNewModel((new DrawPoint(auxIntersection))->setPointColor(rgbCircleLine[2])->overrideModelName()->setPointSize(interPointSize));
+    }
 
     // Free resources
 
@@ -390,6 +552,10 @@ void AlgGeom::SceneContent::pr1B()
     sg2 = nullptr;
     delete p;
     p = nullptr;
+    delete c1;
+    c1 = nullptr;
+    delete c2;
+    c2 = nullptr;
 }
 
 Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)

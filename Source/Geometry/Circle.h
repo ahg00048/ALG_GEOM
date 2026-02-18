@@ -14,7 +14,7 @@
 class Circle 
 {
 public:
-    enum class RelationCircles
+    enum RelationCircles
     {
         CONCENTRIC = 0,
         EXTERNAL, 
@@ -24,13 +24,33 @@ public:
         EXTERNAL_TANG
     };
 
-    enum class RelationCircleLine
+    enum RelationCircleLine
     {
         INTERSECT = 0,
         TANGENTS,
         NO_INTERSECT
     };
 
+    static std::string lineRelToString(Circle::RelationCircleLine rel)
+    {
+        std::string strs[3] = { "INTERSECT",
+                                "TANGENTS",
+                                "NO_INTERSECT" };
+
+        return strs[rel];
+    }
+
+    static std::string circleRelToString(Circle::RelationCircles rel)
+    {
+        std::string strs[6] = { "CONCENTRIC",
+                                "EXTERNAL",
+                                "INTERNAL",
+                                "SECANT",
+                                "INTERIOR_TANG",
+                                "EXTERNAL_TANG" };
+
+        return strs[rel];
+    }
 protected:
     Point       _center;             
     double      _radius;

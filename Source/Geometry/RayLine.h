@@ -30,7 +30,7 @@ public:
 	/**
 	*	@brief Distance from a point defined by 'vector' to this rayline.
 	*/
-	float distanceToPoint(Vect2d& vector);
+	float distToPoint(Vect2d& vector);
 
 	/**
 	*	@brief Checks if this rayline intersects with a segment in an incorrect way.

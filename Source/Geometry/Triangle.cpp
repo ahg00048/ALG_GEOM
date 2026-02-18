@@ -36,11 +36,11 @@ Circle Triangle::getCirumscribed() const {
 	const double triangleArea4 = 2.0 * _a.triangleArea2(_b, _c);
 
 	double radius = (C * A * B) / fabs(triangleArea4);
-	double Xp = _a.getX() + (fabs(BasicGeometry::determinant2x2(Yac, pow(B, 2), 
+	double Xp = _a.getX() + ((BasicGeometry::determinant2x2(Yac, pow(B, 2), 
 																pow(C, 2), Yab))
 																/ triangleArea4);
 
-	double Yp = _a.getY() + (fabs(BasicGeometry::determinant2x2(pow(B, 2), Xac,
+	double Yp = _a.getY() + ((BasicGeometry::determinant2x2(pow(B, 2), Xac,
 																Xab, pow(C, 2)))
 																/ triangleArea4);
 

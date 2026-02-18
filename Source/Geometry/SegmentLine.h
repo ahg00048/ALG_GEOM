@@ -80,7 +80,7 @@ public:
 	/**
 	*	@brief Distance from a point defined by 'vector' to this segment.
 	*/
-	float distPointSegment(Vect2d& vector);
+	float distToPointSeg(Vect2d& vector);
 
 	/**
 	*	@brief Checks if a segment is equal to this one.

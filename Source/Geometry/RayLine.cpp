@@ -17,7 +17,7 @@ RayLine::~RayLine()
 {
 }
 
-float RayLine::distanceToPoint(Vect2d& vector)
+float RayLine::distToPoint(Vect2d& vector)
 {
 	float distance = 0.0f;
 	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());

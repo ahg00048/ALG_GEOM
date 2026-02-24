@@ -112,8 +112,8 @@ const Circle::RelationCircleLine Circle::intersect(SegmentLine& sg, Vect2d& v1, 
     double t1 = -(d.dot(diff) + sqrt(delta)) / pow(d.getModule(), 2);
     double t2 = -(d.dot(diff) - sqrt(delta)) / pow(d.getModule(), 2);
 
-    bool insideSgT1 = (t1 <= 1 && t1 >= 0);
-    bool insideSgT2 = (t2 <= 1 && t2 >= 0);
+    bool insideSgT1 = (BasicGeometry::lessOrEqual(t1, 1) && BasicGeometry::lessOrEqual(0, t1));
+    bool insideSgT2 = (BasicGeometry::lessOrEqual(t2, 1) && BasicGeometry::lessOrEqual(0, t2));
 
     if (BasicGeometry::equal(delta, 0) && insideSgT1)
     {
@@ -153,8 +153,8 @@ const Circle::RelationCircleLine Circle::intersect(RayLine& r, Vect2d& v1, Vect2
     v1 = r.getPoint(t1);
     v2 = r.getPoint(t2);
 
-    bool insideRayT1 = (t1 >= 0);
-    bool insideRayT2 = (t2 >= 0);
+    bool insideRayT1 = BasicGeometry::lessOrEqual(0, t1);
+    bool insideRayT2 = BasicGeometry::lessOrEqual(0, t2);
 
     if (BasicGeometry::equal(delta, 0) && insideRayT1)
     {

@@ -3,6 +3,7 @@
 namespace BasicGeometry
 {
 	bool equal(double a, double b);
+	bool lessOrEqual(double a, double b);
 	double determinant2x2(double a, double b, double c, double d);
 	double determinant3x3(double a, double b, double c, double d, double e, double f, double g, double h, double i);
 	double min3(double a, double b, double c);
@@ -14,6 +15,10 @@ namespace BasicGeometry
 inline bool BasicGeometry::equal(double a, double b) 
 {
 	return (abs(a - b) < glm::epsilon<double>());
+}
+
+inline bool BasicGeometry::lessOrEqual(double a, double b) {
+	return (a < b) || BasicGeometry::equal(a, b);
 }
 
 inline double BasicGeometry::determinant2x2(double a, double b, double c, double d)

@@ -126,8 +126,8 @@ void AlgGeom::SceneContent::pr1A()
         sgl2->setB(pc->getPoint(RandomUtilities::getUniformRandomInt(0, cloudSize - 1)));
     } while (!sgl1->segmentIntersection(*sgl2));
 
-    this->addNewModel((new DrawSegment(*sgl1))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
-    this->addNewModel((new DrawSegment(*sgl2))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
+    this->addNewModel((new DrawSegment(*sgl1))->setLineColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
+    this->addNewModel((new DrawSegment(*sgl2))->setLineColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());
     delete sgl1;
     delete sgl2;
     sgl1 = nullptr;

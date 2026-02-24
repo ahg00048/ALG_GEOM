@@ -83,6 +83,7 @@ inline vec3 RandomUtilities::getRandomToSphere(float radius, float distanceSquar
 inline float RandomUtilities::getUniformRandom()
 {
 	static RandomNumberGenerator generator;
+	generator.seed(std::random_device{} ());
 	static DoubleUniformDistribution distribution(.0f, 1.0f);
 
 	return distribution(generator);

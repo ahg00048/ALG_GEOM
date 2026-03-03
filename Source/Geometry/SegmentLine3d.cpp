@@ -49,7 +49,7 @@ double SegmentLine3d::distance(Vect3d& v) {
 	} 
 	else
 	{
-		Vect3d v2 = tDir.scalarMul(t);
+		Vect3d v2 = tDir.scalarMul(t).add(_orig);
 
 		distance = v.sub(v2).module();
 	}

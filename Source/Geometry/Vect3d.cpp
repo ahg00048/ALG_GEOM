@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "Vect3d.h"
 
-#include "BasicGeometry.h"z
+#include "BasicGeometry.h"
 
 Vect3d::Vect3d()
 {
-	this->setVert(FLT_MAX, FLT_MAX, FLT_MAX);
+	setVert(FLT_MAX, FLT_MAX, FLT_MAX);
 }
 
 Vect3d::Vect3d(double x, double y, double z)
 {
-	this->_value[X] = x;
-	this->_value[Y] = y;
-	this->_value[Z] = z;
+	_value[X] = x;
+	_value[Y] = y;
+	_value[Z] = z;
 }
 
 Vect3d::Vect3d(const Vect3d& vector)
@@ -75,9 +75,9 @@ double Vect3d::module() const
 
 Vect3d& Vect3d::operator=(const Vect3d& vector)
 {
-	this->_value[X] = vector._value[X];
-	this->_value[Y] = vector._value[Y];
-	this->_value[Z] = vector._value[Z];
+	_value[X] = vector._value[X];
+	_value[Y] = vector._value[Y];
+	_value[Z] = vector._value[Z];
 
 	return *this;
 }
@@ -105,24 +105,24 @@ Vect3d Vect3d::scalarMul(double value) const
 
 void Vect3d::setX(double x)
 {
-	this->_value[X] = x;
+	_value[X] = x;
 }
 
 void Vect3d::setY(double y)
 {
-	this->_value[Y] = y;
+	_value[Y] = y;
 }
 
 void Vect3d::setZ(double z)
 {
-	this->_value[Z] = z;
+	_value[Z] = z;
 }
 
 void Vect3d::setVert(double x, double y, double z)
 {
-	this->_value[X] = x;
-	this->_value[Y] = y;
-	this->_value[Z] = z;
+	_value[X] = x;
+	_value[Y] = y;
+	_value[Z] = z;
 }
 
 Vect3d Vect3d::sub(Vect3d& b) const
@@ -133,4 +133,21 @@ Vect3d Vect3d::sub(Vect3d& b) const
 Vect3d Vect3d::xProduct(Vect3d& b) const
 {
 	return Vect3d(getY() * b.getZ() - getZ() * b.getY(), getZ() * b.getX() - getX() * b.getZ(), getX() * b.getY() - getY() * b.getX());
+}
+
+Vect3d Vect3d::normalize()
+{
+	double mod = module();
+
+	return Vect3d(_value[X] / mod, _value[Y] / mod, _value[Z] /= mod);
+}
+
+void Vect3d::getPlane(Vect3d& v, Vect3d& n, float& d) const
+{
+	n.setX(v.getX() - getX());
+	n.setY(v.getY() - getY());
+	n.setZ(v.getZ() - getZ());
+
+	d = (pow(v.getX(), 2) - pow(getX(), 2) + pow(v.getY(), 2) - pow(getY(), 2) + pow(v.getZ(), 2) - pow(getZ(), 2))
+		/ 2.0f;
 }

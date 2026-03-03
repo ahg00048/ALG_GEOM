@@ -31,6 +31,17 @@ Vect3d Edge3d::getOrigin()
 	return _orig;
 }
 
+void Edge3d::setOrigin(const Vect3d& orig)
+{
+	_orig = orig;
+}
+
+void Edge3d::setDestination(const Vect3d& dest)
+{
+	_dest = dest;
+}
+
+
 Vect3d Edge3d::getPoint(double t)
 {
 	if (!isTvalid(t)) return Vect3d();

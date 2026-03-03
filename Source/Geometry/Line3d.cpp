@@ -42,7 +42,8 @@ Line3d Line3d::normalLine(Vect3d& point)
 	Vect3d tDir = _dest.sub(_orig);
 	Vect3d pt = point.sub(_orig);
 	double lambda = tDir.dot(pt) / tDir.dot(tDir);
-	Vect3d point2 = tDir.scalarMul(lambda);
+	
+	Vect3d point2 = tDir.scalarMul(lambda).add(_orig);
 
 	return Line3d(point, point2);
 }
@@ -51,7 +52,8 @@ double Line3d::distance(Vect3d& p) {
 	Vect3d tDir = _dest.sub(_orig);
 	Vect3d pt = p.sub(_orig);
 	double lambda = tDir.dot(pt) / tDir.dot(tDir);
-	Vect3d point2 = tDir.scalarMul(lambda);
+	
+	Vect3d point2 = tDir.scalarMul(lambda).add(_orig);
 	
 	return p.sub(point2).module();
 }

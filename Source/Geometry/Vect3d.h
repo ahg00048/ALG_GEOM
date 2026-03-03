@@ -81,6 +81,8 @@ public:
 	*/
 	std::vector<double> getVert();
 
+	void getPlane(Vect3d& v, Vect3d& n, float& d) const;
+
 	/**
 	*	@brief Returns a certain coordinate of the vector.
 	*/
@@ -165,4 +167,6 @@ public:
 	*	@brief Vectorial product.
 	*/
 	Vect3d xProduct(Vect3d& b) const;
+
+	Vect3d normalize();
 };

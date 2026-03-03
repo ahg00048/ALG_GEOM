@@ -63,6 +63,10 @@ public:
 	*/
 	Vect3d getOrigin();
 
+	void setOrigin(const Vect3d& orig);
+	
+	void setDestination(const Vect3d& dest);
+
 	/**
 	*	@brief Returns a point given the parametric value. It may be wrong if the t value is not valid for the specific subclass.
 	*/

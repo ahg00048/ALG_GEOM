@@ -195,6 +195,7 @@
     <ClCompile Include="Geometry\SegmentLine.cpp" />
     <ClCompile Include="Geometry\Triangle.cpp" />
     <ClCompile Include="Geometry\Vect2d.cpp" />
+    <ClCompile Include="Geometry\Vect3d.cpp" />
     <ClCompile Include="Geometry\Vertex.cpp" />
     <ClCompile Include="Geometry\Voxelization.cpp" />
     <ClCompile Include="main.cpp" />
@@ -258,6 +259,7 @@
     <ClInclude Include="Geometry\SegmentLine.h" />
     <ClInclude Include="Geometry\Triangle.h" />
     <ClInclude Include="Geometry\Vect2d.h" />
+    <ClInclude Include="Geometry\Vect3d.h" />
     <ClInclude Include="Geometry\Vertex.h" />
     <ClInclude Include="Geometry\Voxelization.h" />
     <ClInclude Include="Libraries\imgizmo\ImZoomSlider.h" />

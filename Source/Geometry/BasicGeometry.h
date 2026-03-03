@@ -2,6 +2,8 @@
 
 namespace BasicGeometry
 {
+	const float EPSILON = glm::epsilon<float>();
+
 	bool equal(double a, double b);
 	bool lessOrEqual(double a, double b);
 	double determinant2x2(double a, double b, double c, double d);

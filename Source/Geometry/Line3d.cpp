@@ -37,6 +37,61 @@ double Line3d::distance(Line3d& line)
 		tDir.module();
 }
 
+double Line3d::distance(SegmentLine3d& segm)
+{
+	Vect3d segOrig = segm.getOrigin();
+	Vect3d lDir = (_dest.sub(_orig)).normalize();
+	Vect3d segDir = (segm.getDestination().sub(segOrig)).normalize();
+	
+	Vect3d u = _orig.sub(segOrig);
+	double a = lDir.dot(lDir);
+	double b = lDir.dot(segDir);
+	double c = segDir.dot(segDir);
+	double d = lDir.dot(u);
+	double e = segDir.dot(u);
+	double det = a * c - b * b;
+	
+	double sDenom = det;
+	double sNum = 0.0;
+	double tNum = 0.0;
+	double tDenom = 0.0;
+
+	if (det < BasicGeometry::EPSILON)
+	{
+		sNum = 0.0;
+		tNum = e;
+		tDenom = c;
+	} 
+	else
+	{
+		sNum = b * e - c * d;
+		tNum = a * e - b * d;
+	}
+
+	if(tNum < 0.0)
+	{
+		tNum = 0.0;
+		sNum = -d;
+		sDenom = a;
+	}
+	else if (tNum > tDenom)
+	{
+		tNum = tDenom;
+		sNum = -d + b;
+		sDenom = a;
+	}
+
+	double s = sNum / sDenom;
+	double t = tNum / tDenom;
+
+	Vect3d sLDir = lDir.scalarMul(s);
+	Vect3d tSegDir = segDir.scalarMul(t);
+	Vect3d A1 = _orig.add(sLDir);
+	Vect3d A2 = segOrig.add(tSegDir);
+	Vect3d v = A1.sub(A2);
+	return v.module(); //dot?
+}
+
 Line3d Line3d::normalLine(Vect3d& point)
 {
 	Vect3d tDir = _dest.sub(_orig);

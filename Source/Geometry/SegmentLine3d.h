@@ -52,8 +52,8 @@ public:
 	virtual ~SegmentLine3d();
 
 	/**
-*	@brief Obtains de minimum segment-point distance
-*/
+	*	@brief Obtains de minimum segment-point distance
+	*/
 	double distance(Vect3d& v);
 
 	/**

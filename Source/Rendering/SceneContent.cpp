@@ -8,60 +8,14 @@
 #include <format>
 #include <string>
 
-#define INITIAL_CODE false
-#define PR1_A true
-
 // ----------------------------- BUILD YOUR SCENARIO HERE -----------------------------------
 
 void AlgGeom::SceneContent::buildScenario()
 {
-#if INITIAL_CODE
-    vec2 minBoundaries = vec2(-2.0, -.4), maxBoundaries = vec2(-minBoundaries);
-
-    // Random segments
-    int numSegments = 8;
-
-    for (int segmentIdx = 0; segmentIdx < numSegments; ++segmentIdx)
-    {
-        Point a(RandomUtilities::getUniformRandom(minBoundaries.x, maxBoundaries.x), RandomUtilities::getUniformRandom(minBoundaries.y, maxBoundaries.y));
-        Point b(RandomUtilities::getUniformRandom(minBoundaries.x, maxBoundaries.x), RandomUtilities::getUniformRandom(minBoundaries.y, maxBoundaries.y));
-        SegmentLine* segment = new SegmentLine(a, b);
-
-        this->addNewModel((new DrawSegment(*segment))->setLineColor(RandomUtilities::getUniformRandomColor())->overrideModelName()->setLineWidth(RandomUtilities::getUniformRandom(1.0f, 3.0f)));
-        delete segment;
-    }
-
-    // Random points
-    int numPoints = 200;
-
-    for (int pointIdx = 0; pointIdx < numPoints; ++pointIdx)
-    {
-        Point point(RandomUtilities::getUniformRandom(minBoundaries.x, maxBoundaries.x), RandomUtilities::getUniformRandom(minBoundaries.x, maxBoundaries.x));
-        this->addNewModel((new DrawPoint(point))->setPointColor(RandomUtilities::getUniformRandomColor())->overrideModelName()->setPointSize(RandomUtilities::getUniformRandom(4.0f, 8.0f)));
-    }
-
-    // Polygon
-    float polygonAngle = .0f;
-    constexpr float polygonAlpha = 2.0f * glm::pi<float>() / 5.0f;
-    Polygon* polygon = new Polygon;
-
-    while (polygonAngle < 2.0f * glm::pi<float>())
-    {
-        polygon->add(Point(std::cos(polygonAngle), std::sin(polygonAngle)));
-        polygonAngle += polygonAlpha;
-    }
-
-    this->addNewModel((new DrawPolygon(*polygon))->setTriangleColor(vec4(RandomUtilities::getUniformRandomColor(), 1.0f))->overrideModelName()->setModelMatrix(glm::rotate(mat4(1.0f), (glm::abs(4 * polygonAlpha - glm::pi<float>() / 2.0f * 3.0f)), vec3(.0f, .0f, 1.0f))));
-    delete polygon;
-
-    // Line
-    Line* line = new Line(Point(-1.0, -1.0), Point(1.0, 1.0));
-    this->addNewModel((new DrawLine(*line))->setLineColor(vec4(.0f, 1.0f, .0f, 1.0f))->overrideModelName()->setLineWidth(2.0f));
-#elif PR1_A
-    pr1A();
-#else
-    pr1B();
-#endif
+    pr2A();
+    //pr2B();
+    //pr2C();
+    //pr2D();
 }
 
 
@@ -555,6 +509,26 @@ void AlgGeom::SceneContent::pr1B()
     c1 = nullptr;
     delete c2;
     c2 = nullptr;
+}
+
+void AlgGeom::SceneContent::pr2A()
+{
+
+}
+
+void AlgGeom::SceneContent::pr2B()
+{
+
+}
+
+void AlgGeom::SceneContent::pr2C()
+{
+
+}
+
+void AlgGeom::SceneContent::pr2D() 
+{
+
 }
 
 Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)

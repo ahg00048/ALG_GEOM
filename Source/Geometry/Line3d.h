@@ -23,10 +23,8 @@
  * Created on 25 de enero de 2021, 19:55
  */
 
-
 #include "Edge3d.h"
-#include "Line3d.h"
-
+#include "SegmentLine3d.h"
 
 class Line3d : public Edge3d
 {
@@ -65,6 +63,10 @@ public:
 	*/
 	double distance(Line3d& line);
 
+	/**
+	*	@brief Distance between a line and a segment.
+	*/
+	double distance(SegmentLine3d& segm);
 
 	/**
 	*    @brief Distance between point p and this.

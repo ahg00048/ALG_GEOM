@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "SegmentLine3d.h"
+#include "BasicGeometry.h"
 
 SegmentLine3d::SegmentLine3d(Vect3d& orig, Vect3d& dest)
 	: Edge3d(orig, dest)

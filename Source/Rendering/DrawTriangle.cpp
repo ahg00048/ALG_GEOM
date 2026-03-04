@@ -15,6 +15,5 @@ AlgGeom::DrawTriangle::DrawTriangle (Triangle &triangle): Model3D(), _triangle(t
     component->completeTopology();
     this->_components.push_back(std::unique_ptr<Component>(component));
 
-    this->calculateAABB();
     this->buildVao(component);
 }

@@ -18,7 +18,6 @@ AlgGeom::DrawLine::DrawLine (Line &line): Model3D() {
 
     component->completeTopology();
 
-    this->calculateAABB();
     this->buildVao(component);
 }
 
@@ -37,6 +36,5 @@ AlgGeom::DrawLine::DrawLine(Line3d& line) : Model3D()
 
     component->completeTopology();
 
-    this->calculateAABB();
     this->buildVao(component);
 }

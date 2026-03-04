@@ -85,7 +85,6 @@ void AlgGeom::SceneContent::addNewCamera(ApplicationState* appState)
 
 void AlgGeom::SceneContent::addNewModel(Model3D* model)
 {	
-	_sceneAABB.update(model->getAABB());
 	_model.push_back(std::unique_ptr<Model3D>(model));
 }
 

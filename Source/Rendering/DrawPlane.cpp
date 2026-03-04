@@ -16,6 +16,5 @@ AlgGeom::DrawPlane::DrawPlane(Plane& plane) : Model3D()
 
     this->_components.push_back(std::unique_ptr<Component>(component));
 
-    this->calculateAABB();
     this->buildVao(component);
 }

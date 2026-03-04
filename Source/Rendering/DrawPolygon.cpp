@@ -3,12 +3,12 @@
 
 // Public methods
 
-AlgGeom::DrawPolygon::DrawPolygon (Polygon &polygon): Model3D(), _polygon(polygon) 
+AlgGeom::DrawPolygon::DrawPolygon (Polygon &polygon): Model3D()
 {   
-    size_t numVertices = _polygon.getNumVertices();
+    size_t numVertices = polygon.getNumVertices();
     Component* component = new Component;
 
-    for (unsigned vertexIdx = 0; vertexIdx < _polygon.getNumVertices(); vertexIdx++) {
+    for (unsigned vertexIdx = 0; vertexIdx < polygon.getNumVertices(); vertexIdx++) {
 
         Point point = _polygon.getVertexAt(vertexIdx).getPoint();
 
@@ -18,6 +18,5 @@ AlgGeom::DrawPolygon::DrawPolygon (Polygon &polygon): Model3D(), _polygon(polygo
 
     this->_components.push_back(std::unique_ptr<Component>(component));
 
-    this->calculateAABB();
     this->buildVao(component);
 }

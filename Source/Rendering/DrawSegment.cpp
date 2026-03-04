@@ -16,7 +16,6 @@ AlgGeom::DrawSegment::DrawSegment(SegmentLine& segment) : Model3D()
 
     component->completeTopology();
 
-    this->calculateAABB();
     this->buildVao(component);
 }
 
@@ -33,6 +32,5 @@ AlgGeom::DrawSegment::DrawSegment(SegmentLine3d& segment) : Model3D()
 
     component->completeTopology();
 
-    this->calculateAABB();
     this->buildVao(component);
 }

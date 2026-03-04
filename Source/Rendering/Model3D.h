@@ -90,7 +90,7 @@ namespace AlgGeom
 	protected:
 		void buildVao(Component* component);
 		void calculateAABB();
-		static Component* getVoxel();
+		Component* getVoxel();
 		void loadModelBinaryFile(const std::string& path);
 		void writeBinaryFile(const std::string& path);
 

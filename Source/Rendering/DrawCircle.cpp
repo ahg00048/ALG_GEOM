@@ -26,6 +26,5 @@ AlgGeom::DrawCircle::DrawCircle(Circle& circle, uint32_t numSubdivisions): Model
     component->completeTopology();
     this->_components.push_back(std::unique_ptr<Component>(component));
 
-    this->calculateAABB();
     this->buildVao(component);
 }

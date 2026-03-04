@@ -18,7 +18,6 @@ AlgGeom::DrawRay::DrawRay(RayLine& ray) : Model3D()
 
     component->completeTopology();
 
-    this->calculateAABB();
     this->buildVao(component);
 }
 
@@ -37,6 +36,5 @@ AlgGeom::DrawRay::DrawRay(RayLine3d& ray) : Model3D()
 
     component->completeTopology();
 
-    this->calculateAABB();
     this->buildVao(component);
 }

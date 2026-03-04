@@ -8,7 +8,7 @@ std::unordered_set<std::string> AlgGeom::Model3D::USED_NAMES;
 
 // Public methods
 
-AlgGeom::Model3D::Model3D(): _modelMatrix(1.0f)
+AlgGeom::Model3D::Model3D() : _modelMatrix(1.0f)
 {
     this->overrideModelName();
 }
@@ -30,6 +30,8 @@ bool AlgGeom::Model3D::belongsModel(Component* component)
 
 void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* matrixInformation, ApplicationState* appState, GLuint primitive)
 {
+    shader->setSubroutineUniform(GL_VERTEX_SHADER, "instanceUniform", "singleInstanceUniform");
+
     for (auto& component : _components)
     {
         if (component->_enabled && component->_vao)
@@ -72,7 +74,7 @@ void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* ma
             }
 
             if (!component->_activeRendering[rendering]) continue;
-            
+
             shader->setUniform("mModelViewProj", matrixInformation->multiplyMatrix(MatrixRenderInformation::VIEW_PROJECTION, this->_modelMatrix));
             shader->applyActiveSubroutines();
 
@@ -86,14 +88,14 @@ void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* ma
 
 AlgGeom::Model3D* AlgGeom::Model3D::moveGeometryToOrigin(const mat4& origMatrix, float maxScale)
 {
-    AABB aabb = this->getAABB();
+    //AABB aabb = this->getAABB();
 
-    vec3 translate = -aabb.center();
-    vec3 extent = aabb.extent();
-    float maxScaleAABB = std::max(extent.x, std::max(extent.y, extent.z));
-    vec3 scale = (maxScale < FLT_MAX) ? ((maxScale > maxScaleAABB) ? vec3(1.0f) : vec3(maxScale / maxScaleAABB)) : vec3(1.0f);
+    //vec3 translate = -aabb.center();
+    //vec3 extent = aabb.extent();
+    //float maxScaleAABB = std::max(extent.x, std::max(extent.y, extent.z));
+    //vec3 scale = (maxScale < FLT_MAX) ? ((maxScale > maxScaleAABB) ? vec3(1.0f) : vec3(maxScale / maxScaleAABB)) : vec3(1.0f);
 
-    _modelMatrix = glm::scale(glm::mat4(1.0f), scale) * glm::translate(glm::mat4(1.0f), translate) * origMatrix;
+    //_modelMatrix = glm::scale(glm::mat4(1.0f), scale) * glm::translate(glm::mat4(1.0f), translate) * origMatrix;
 
     return this;
 }
@@ -195,24 +197,13 @@ void AlgGeom::Model3D::buildVao(Component* component)
     component->_vao = vao;
 }
 
-void AlgGeom::Model3D::calculateAABB()
-{
-  _aabb = AABB();
-
-  for (auto& component : _components)
-    for (VAO::Vertex& vertex : component->_vertices)
-      _aabb.update(vertex._position);
-}
-
-// Protected methods
-
 AlgGeom::Model3D::Component* AlgGeom::Model3D::getVoxel()
 {
     Component* component = new Component;
 
     // Geometry
     {
-	    constexpr vec3 minPosition(-.5f), maxPosition(.5f);
+        const vec3 minPosition(-.5f), maxPosition(.5f);
         const std::vector<vec3> points
         {
             vec3(minPosition[0], minPosition[1], maxPosition[2]),		vec3(maxPosition[0], minPosition[1], maxPosition[2]),
@@ -250,77 +241,6 @@ AlgGeom::Model3D::Component* AlgGeom::Model3D::getVoxel()
     }
 
     return component;
-}
-
-void AlgGeom::Model3D::loadModelBinaryFile(const std::string& path)
-{
-    std::ifstream fin(path, std::ios::in | std::ios::binary);
-    if (!fin.is_open())
-    {
-        std::cout << "Failed to open the binary file " << path << "!" << std::endl;
-        return;
-    }
-
-    size_t numComponents = _components.size();
-    fin.read((char*)&numComponents, sizeof(size_t));
-    _components.resize(numComponents);
-
-    for (size_t compIdx = 0; compIdx < numComponents; ++compIdx)
-    {
-        Component* component = new Component;
-        size_t numVertices, numIndices;
-
-        fin.read((char*)&numVertices, sizeof(size_t));
-        component->_vertices.resize(numVertices);
-        fin.read((char*)component->_vertices.data(), sizeof(VAO::Vertex) * numVertices);
-
-        for (int topology = 0; topology < VAO::NUM_IBOS; ++topology)
-        {
-            fin.read((char*)&numIndices, sizeof(size_t));
-            if (numIndices)
-            {
-                component->_indices[topology].resize(numIndices);
-                fin.read((char*)component->_indices[topology].data(), sizeof(GLuint) * numIndices);
-            }
-        }
-
-        fin.read((char*)&component->_aabb, sizeof(AABB));
-
-        _components[compIdx] = std::unique_ptr<Component>(component);
-        _aabb.update(_components[compIdx]->_aabb);
-    }
-}
-
-void AlgGeom::Model3D::writeBinaryFile(const std::string& path)
-{
-    std::ofstream fout(path, std::ios::out | std::ios::binary);
-    if (!fout.is_open())
-    {
-        std::cout << "Failed to write the binary file!" << std::endl;
-    }
-
-    size_t numComponents = _components.size();
-    fout.write((char*)&numComponents, sizeof(size_t));
-
-    for (auto& component: _components)
-    {
-        size_t numVertices = component->_vertices.size();
-
-        fout.write((char*)&numVertices, sizeof(size_t));
-        fout.write((char*)component->_vertices.data(), numVertices * sizeof(VAO::Vertex));
-
-        for (int topology = 0; topology < VAO::NUM_IBOS; ++topology)
-        {
-            size_t numIndices = component->_indices[topology].size();
-            fout.write((char*)&numIndices, sizeof(size_t));
-            if (numIndices) 
-                fout.write((char*)component->_indices[topology].data(), numIndices * sizeof(GLuint));
-        }
-
-        fout.write((char*)(&component->_aabb), sizeof(AABB));
-    }
-
-    fout.close();
 }
 
 AlgGeom::Model3D::MatrixRenderInformation::MatrixRenderInformation()
@@ -361,27 +281,27 @@ void AlgGeom::Model3D::Component::generateWireframe()
 {
     std::unordered_map<int, std::unordered_set<int>>* segmentIncluded = new std::unordered_map<int, std::unordered_set<int>>;
     auto isIncluded = [&](int index1, int index2) -> bool
-    {
-        std::unordered_map<int, std::unordered_set<int>>::iterator it;
-
-        if ((it = segmentIncluded->find(index1)) != segmentIncluded->end())
         {
-            if (it->second.find(index2) != it->second.end())
-            {
-                return true;
-            }
-        }
+            std::unordered_map<int, std::unordered_set<int>>::iterator it;
 
-        if ((it = segmentIncluded->find(index2)) != segmentIncluded->end())
-        {
-            if (it->second.find(index1) != it->second.end())
+            if ((it = segmentIncluded->find(index1)) != segmentIncluded->end())
             {
-                return true;
+                if (it->second.find(index2) != it->second.end())
+                {
+                    return true;
+                }
             }
-        }
 
-        return false;
-    };
+            if ((it = segmentIncluded->find(index2)) != segmentIncluded->end())
+            {
+                if (it->second.find(index1) != it->second.end())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
 
     const size_t numIndices = this->_indices[VAO::IBO_TRIANGLE].size();
 

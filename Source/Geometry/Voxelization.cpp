@@ -40,56 +40,6 @@ Voxelization::~Voxelization()
 	delete[] _voxel;
 }
 
-AlgGeom::DrawVoxelization* Voxelization::getRenderingObject(bool useColors) const
-{
-	AlgGeom::DrawVoxelization* voxelization = nullptr;
-
-	if (useColors)
-	{
-		unsigned linearIndex = 0, numVoxels = _splits.x * _splits.y * _splits.z;
-		vec3* positions = new vec3[numVoxels];
-		vec3* colors = new vec3[numVoxels];
-		vec3 color[] = { vec3(.0f), vec3(.5f), vec3(1.0f) };
-
-		for (unsigned x = 0; x < _splits.x; ++x)
-		{
-			for (unsigned y = 0; y < _splits.y; ++y)
-			{
-				for (unsigned z = 0; z < _splits.z; ++z)
-				{
-					linearIndex = z + y * _splits.z + x * _splits.z * _splits.y;
-					positions[linearIndex] = _voxel[x][y][z]._aabb.center();
-					colors[linearIndex] = color[_voxel[x][y][z]._status];
-				}
-			}
-		}
-
-		voxelization = new AlgGeom::DrawVoxelization(positions, numVoxels, _voxelSize, colors);
-		delete[] positions;
-		delete[] colors;
-	}
-	else
-	{
-		std::vector<vec3> positions;
-
-		for (unsigned x = 0; x < _splits.x; ++x)
-		{
-			for (unsigned y = 0; y < _splits.y; ++y)
-			{
-				for (unsigned z = 0; z < _splits.z; ++z)
-				{
-					if (_voxel[x][y][z]._status == Voxel::INNER)
-						positions.push_back(_voxel[x][y][z]._aabb.center());
-				}
-			}
-		}
-
-		voxelization = new AlgGeom::DrawVoxelization(positions.data(), positions.size(), _voxelSize, nullptr);
-	}
-
-	return voxelization;
-}
-
 void Voxelization::printData() const
 {
 	unsigned numOccupiedVoxels = 0;
@@ -118,7 +68,10 @@ void Voxelization::printData() const
 
 ivec3 Voxelization::getIndices(const vec3& point) const
 {
-	return ivec3((point - _aabb.min()) / _voxelSize);
+	Vect3d aabbMin = _aabb.getMin();
+	vec3 aabbMinVec3(aabbMin.getX(), aabbMin.getY(), aabbMin.getZ());
+	
+	return ivec3((point - aabbMinVec3) / _voxelSize);
 }
 
 void Voxelization::insertPoint(const vec3& point, unsigned triangleIdx) const

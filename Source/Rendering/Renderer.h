@@ -6,6 +6,8 @@
 #include "GUI.h"
 #include "InclDraw2D.h"
 #include "InclGeom2D.h"
+#include "InclDraw3D.h"
+#include "InclGeom3D.h"
 #include "InputManager.h"
 #include "Model3D.h"
 #include "RenderingShader.h"

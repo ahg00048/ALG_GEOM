@@ -1,11 +1,19 @@
 #include "stdafx.h"
 #include "Vect3d.h"
 
+#include "Triangle3d.h"
 #include "BasicGeometry.h"
 
 Vect3d::Vect3d()
 {
 	setVert(FLT_MAX, FLT_MAX, FLT_MAX);
+}
+
+Vect3d::Vect3d(vec3 vec) 
+{
+	_value[X] = vec.x;
+	_value[Y] = vec.y;
+	_value[Z] = vec.z;
 }
 
 Vect3d::Vect3d(double x, double y, double z)
@@ -139,7 +147,7 @@ Vect3d Vect3d::normalize()
 {
 	double mod = module();
 
-	return Vect3d(_value[X] / mod, _value[Y] / mod, _value[Z] /= mod);
+	return Vect3d(_value[X] / mod, _value[Y] / mod, _value[Z] / mod);
 }
 
 void Vect3d::getPlane(Vect3d& v, Vect3d& n, float& d) const
@@ -150,4 +158,9 @@ void Vect3d::getPlane(Vect3d& v, Vect3d& n, float& d) const
 
 	d = (pow(v.getX(), 2) - pow(getX(), 2) + pow(v.getY(), 2) - pow(getY(), 2) + pow(v.getZ(), 2) - pow(getZ(), 2))
 		/ 2.0f;
+}
+
+Vect3d::operator vec3() const
+{
+	return vec3(_value[X], _value[Y], _value[Z]);
 }

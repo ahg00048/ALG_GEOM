@@ -2,9 +2,6 @@
 
 #include "AABB.h"
 #include "ApplicationState.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 #include "RenderingShader.h"
 #include "Texture.h"
 #include "TextureList.h"
@@ -89,8 +86,8 @@ namespace AlgGeom
 
 	protected:
 		void buildVao(Component* component);
-		void calculateAABB();
 		Component* getVoxel();
+		void calculateAABB();
 		void loadModelBinaryFile(const std::string& path);
 		void writeBinaryFile(const std::string& path);
 
@@ -100,7 +97,7 @@ namespace AlgGeom
 
 		bool belongsModel(Component* component);
 		virtual void draw(RenderingShader* shader, MatrixRenderInformation* matrixInformation, ApplicationState* appState, GLuint primitive);
-		AABB getAABB() { return _aabb.dot(_modelMatrix); }
+		AABB getAABB() const { return _aabb.dot(_modelMatrix); } 
 		mat4 getModelMatrix() const { return _modelMatrix; }
 		std::string getName() { return _name; }
 		Model3D* moveGeometryToOrigin(const mat4& origMatrix = mat4(1.0f), float maxScale = FLT_MAX);

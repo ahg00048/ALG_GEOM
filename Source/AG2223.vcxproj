@@ -192,12 +192,14 @@
     <ClCompile Include="Geometry\Line3d.cpp" />
     <ClCompile Include="Geometry\Point.cpp" />
     <ClCompile Include="Geometry\PointCloud.cpp" />
+    <ClCompile Include="Geometry\PointCloud3d.cpp" />
     <ClCompile Include="Geometry\Polygon.cpp" />
     <ClCompile Include="Geometry\RayLine.cpp" />
     <ClCompile Include="Geometry\RayLine3d.cpp" />
     <ClCompile Include="Geometry\SegmentLine.cpp" />
     <ClCompile Include="Geometry\SegmentLine3d.cpp" />
     <ClCompile Include="Geometry\Triangle.cpp" />
+    <ClCompile Include="Geometry\Triangle3d.cpp" />
     <ClCompile Include="Geometry\Vect2d.cpp" />
     <ClCompile Include="Geometry\Vect3d.cpp" />
     <ClCompile Include="Geometry\Vertex.cpp" />
@@ -208,6 +210,7 @@
     <ClCompile Include="Rendering\Camera.cpp" />
     <ClCompile Include="Rendering\CameraGuiAdapter.cpp" />
     <ClCompile Include="Rendering\CameraProjection.cpp" />
+    <ClCompile Include="Rendering\DrawAABB.cpp" />
     <ClCompile Include="Rendering\DrawCircle.cpp" />
     <ClCompile Include="Rendering\DrawLine.cpp" />
     <ClCompile Include="Rendering\DrawMesh.cpp" />
@@ -238,6 +241,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Rendering\TextureList.cpp" />
+    <ClCompile Include="Rendering\TriangleModel.cpp" />
     <ClCompile Include="Rendering\VAO.cpp" />
     <ClCompile Include="Rendering\Window.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -262,6 +266,7 @@
     <ClInclude Include="Geometry\Plane.h" />
     <ClInclude Include="Geometry\Point.h" />
     <ClInclude Include="Geometry\PointCloud.h" />
+    <ClInclude Include="Geometry\PointCloud3d.h" />
     <ClInclude Include="Geometry\Polygon.h" />
     <ClInclude Include="Geometry\RandomUtilities.h" />
     <ClInclude Include="Geometry\RayLine.h" />
@@ -269,6 +274,7 @@
     <ClInclude Include="Geometry\SegmentLine.h" />
     <ClInclude Include="Geometry\SegmentLine3d.h" />
     <ClInclude Include="Geometry\Triangle.h" />
+    <ClInclude Include="Geometry\Triangle3d.h" />
     <ClInclude Include="Geometry\Vect2d.h" />
     <ClInclude Include="Geometry\Vect3d.h" />
     <ClInclude Include="Geometry\Vertex.h" />
@@ -278,12 +284,15 @@
     <ClInclude Include="Libraries\imgui\imstb_truetype.h" />
     <ClInclude Include="Patterns\Singleton.h" />
     <ClInclude Include="PrecompiledHeaders\InclDraw2D.h" />
+    <ClInclude Include="PrecompiledHeaders\InclDraw3D.h" />
     <ClInclude Include="PrecompiledHeaders\InclGeom2D.h" />
+    <ClInclude Include="PrecompiledHeaders\InclGeom3D.h" />
     <ClInclude Include="PrecompiledHeaders\stdafx.h" />
     <ClInclude Include="Rendering\ApplicationState.h" />
     <ClInclude Include="Rendering\Camera.h" />
     <ClInclude Include="Rendering\CameraGuiAdapter.h" />
     <ClInclude Include="Rendering\CameraProjection.h" />
+    <ClInclude Include="Rendering\DrawAABB.h" />
     <ClInclude Include="Rendering\DrawCircle.h" />
     <ClInclude Include="Rendering\DrawLine.h" />
     <ClInclude Include="Rendering\DrawMesh.h" />
@@ -311,6 +320,7 @@
     <ClInclude Include="Rendering\Singleton.h" />
     <ClInclude Include="Rendering\Texture.h" />
     <ClInclude Include="Rendering\TextureList.h" />
+    <ClInclude Include="Rendering\TriangleModel.h" />
     <ClInclude Include="Rendering\VAO.h" />
     <ClInclude Include="Rendering\Window.h" />
     <ClInclude Include="Util\StringUtilities.h" />

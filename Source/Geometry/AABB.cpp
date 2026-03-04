@@ -1,13 +1,19 @@
 #include "stdafx.h"
 #include "AABB.h"
 
-// Public methods
-
-AABB::AABB(const vec3& min, const vec3& max) : _max(max), _min(min)
+AABB::AABB()
 {
 }
 
-AABB::AABB(const AABB& aabb) : _max(aabb._max), _min(aabb._min)
+AABB::AABB(const Vect3d& min, const Vect3d& max) : _min(min), _max(max)
+{
+}
+
+AABB::AABB(const AABB& aabb) : _min(aabb._min), _max(aabb._max)
+{
+}
+
+AABB::AABB(const vec3& min, const vec3& max) : _max(max), _min(min)
 {
 }
 
@@ -15,40 +21,52 @@ AABB::~AABB()
 {
 }
 
-AABB& AABB::operator=(const AABB& aabb)
+Vect3d AABB::getCenter()
 {
-	_max = aabb._max;
-	_min = aabb._min;
+	return Vect3d(	(_min.getX() + _max.getX()) / 2.0, 
+					(_min.getY() + _max.getY()) / 2.0, 
+					(_min.getZ() + _max.getZ()) / 2.0);
+}
+
+Vect3d AABB::getExtent()
+{
+	return Vect3d(	(_max.getX() - _min.getX()) / 2.0,
+					(_max.getY() - _min.getY()) / 2.0,
+					(_max.getZ() - _min.getZ()) / 2.0);
+}
+
+AABB& AABB::operator=(const AABB& orig)
+{
+	_min = orig._min;
+	_max = orig._max;
 
 	return *this;
 }
 
-AABB AABB::dot(const mat4& matrix)
+std::ostream& operator<<(std::ostream& os, const AABB& aabb)
 {
-	return AABB(matrix * vec4(_min, 1.0f), matrix * vec4(_max, 1.0f));
+	os << "Maximum: " << aabb._max << ", minimum: " << aabb._min;
+	return os;
+}
+
+AABB AABB::dot(const mat4& matrix) const
+{
+	return AABB(matrix * vec4(vec3(_min), 1.0f), matrix * vec4(vec3(_max), 1.0f));
 }
 
 void AABB::update(const AABB& aabb)
 {
-	this->update(aabb.max());
-	this->update(aabb.min());
+	update(vec3(aabb.getMax()));
+	update(vec3(aabb.getMin()));
 }
 
 void AABB::update(const vec3& point)
 {
-	if (point.x < _min.x) { _min.x = point.x; }
-	if (point.y < _min.y) { _min.y = point.y; }
-	if (point.z < _min.z) { _min.z = point.z; }
+	if (point.x < _min.getX()) { _min.setX(point.x); }
+	if (point.y < _min.getY()) { _min.setY(point.y); }
+	if (point.z < _min.getZ()) { _min.setZ(point.z); }
 
-	if (point.x > _max.x) { _max.x = point.x; }
-	if (point.y > _max.y) { _max.y = point.y; }
-	if (point.z > _max.z) { _max.z = point.z; }
-}
-
-std::ostream& operator<<(std::ostream& os, const AABB& aabb)
-{
-	os << "Maximum corner: " << aabb.max().x << ", " << aabb.max().y << ", " << aabb.max().z << "\n";
-	os << "Minimum corner: " << aabb.min().x << ", " << aabb.min().y << ", " << aabb.min().z << "\n";
-
-	return os;
+	if (point.x > _max.getX()) { _max.setX(point.x); }
+	if (point.y > _max.getY()) { _max.setY(point.y); }
+	if (point.z > _max.getZ()) { _max.setZ(point.z); }
 }

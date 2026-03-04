@@ -14,28 +14,19 @@
 *    along with this program.  If not, see https://github.com/AlfonsoLRz/AG2223.
 */
 
-#pragma once
+#pragma once 
 
+#include "AABB.h"
 #include "Model3D.h"
-#include "TriangleModel.h"
 
 namespace AlgGeom
 {
-	class DrawMesh : public Model3D
-	{
-	protected:
-		Assimp::Importer _assimpImporter;
-
-	protected:
-		Model3D::Component* processMesh(aiMesh* mesh, const aiScene* scene, const std::string& folder);
-		void processNode(aiNode* node, const aiScene* scene, const std::string& folder);
-
-	public:
-		DrawMesh(TriangleModel& triangleModel);
-		DrawMesh(const DrawMesh& drawMesh) = delete;
-		~DrawMesh() override {};
-
-		DrawMesh* loadModelOBJ(const std::string& path);
-	};
+    class DrawAABB : public Model3D
+    {
+    public:
+        DrawAABB(AABB& aabb);
+        DrawAABB(const DrawAABB& dt) = delete;
+        ~DrawAABB() override {};
+    };
 }
 

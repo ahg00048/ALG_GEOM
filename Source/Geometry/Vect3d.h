@@ -41,6 +41,8 @@ public:
 	*/
 	Vect3d();
 
+	Vect3d(vec3 vec);
+
 	/**
 	*	@brief Constructor.
 	*/
@@ -169,4 +171,6 @@ public:
 	Vect3d xProduct(Vect3d& b) const;
 
 	Vect3d normalize();
+
+	operator vec3() const;
 };

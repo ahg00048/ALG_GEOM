@@ -47,7 +47,7 @@ void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* ma
                     shader->setSubroutineUniform(GL_FRAGMENT_SHADER, "kadUniform", "getUniformColor");
                 }
                 else
-                {
+                {   
                     Texture* checkerPattern = TextureList::getInstance()->getTexture(CHECKER_PATTERN_PATH);
                     checkerPattern->applyTexture(shader, 0, "texKdSampler");
                     shader->setSubroutineUniform(GL_FRAGMENT_SHADER, "kadUniform", "getTextureColor");
@@ -197,6 +197,15 @@ void AlgGeom::Model3D::buildVao(Component* component)
     component->_vao = vao;
 }
 
+void AlgGeom::Model3D::calculateAABB()
+{
+    _aabb = AABB();
+
+    for (auto& component : _components)
+        for (VAO::Vertex& vertex : component->_vertices)
+            _aabb.update(vertex._position);
+}
+
 AlgGeom::Model3D::Component* AlgGeom::Model3D::getVoxel()
 {
     Component* component = new Component;
@@ -323,4 +332,75 @@ void AlgGeom::Model3D::Component::generatePointCloud()
 {
     this->_indices[VAO::IBO_POINT].resize(this->_vertices.size());
     std::iota(this->_indices[VAO::IBO_POINT].begin(), this->_indices[VAO::IBO_POINT].end(), 0);
+}
+
+void AlgGeom::Model3D::loadModelBinaryFile(const std::string& path)
+{
+    std::ifstream fin(path, std::ios::in | std::ios::binary);
+    if (!fin.is_open())
+    {
+        std::cout << "Failed to open the binary file " << path << "!" << std::endl;
+        return;
+    }
+
+    size_t numComponents = _components.size();
+    fin.read((char*)&numComponents, sizeof(size_t));
+    _components.resize(numComponents);
+
+    for (size_t compIdx = 0; compIdx < numComponents; ++compIdx)
+    {
+        Component* component = new Component;
+        size_t numVertices, numIndices;
+
+        fin.read((char*)&numVertices, sizeof(size_t));
+        component->_vertices.resize(numVertices);
+        fin.read((char*)component->_vertices.data(), sizeof(VAO::Vertex) * numVertices);
+
+        for (int topology = 0; topology < VAO::NUM_IBOS; ++topology)
+        {
+            fin.read((char*)&numIndices, sizeof(size_t));
+            if (numIndices)
+            {
+                component->_indices[topology].resize(numIndices);
+                fin.read((char*)component->_indices[topology].data(), sizeof(GLuint) * numIndices);
+            }
+        }
+
+        fin.read((char*)&component->_aabb, sizeof(AABB));
+
+        _components[compIdx] = std::unique_ptr<Component>(component);
+        _aabb.update(_components[compIdx]->_aabb);
+    }
+}
+
+void AlgGeom::Model3D::writeBinaryFile(const std::string& path)
+{
+    std::ofstream fout(path, std::ios::out | std::ios::binary);
+    if (!fout.is_open())
+    {
+        std::cout << "Failed to write the binary file!" << std::endl;
+    }
+
+    size_t numComponents = _components.size();
+    fout.write((char*)&numComponents, sizeof(size_t));
+
+    for (auto& component : _components)
+    {
+        size_t numVertices = component->_vertices.size();
+
+        fout.write((char*)&numVertices, sizeof(size_t));
+        fout.write((char*)component->_vertices.data(), numVertices * sizeof(VAO::Vertex));
+
+        for (int topology = 0; topology < VAO::NUM_IBOS; ++topology)
+        {
+            size_t numIndices = component->_indices[topology].size();
+            fout.write((char*)&numIndices, sizeof(size_t));
+            if (numIndices)
+                fout.write((char*)component->_indices[topology].data(), numIndices * sizeof(GLuint));
+        }
+
+        fout.write((char*)(&component->_aabb), sizeof(AABB));
+    }
+
+    fout.close();
 }

@@ -94,9 +94,11 @@ void AlgGeom::GUI::processSelectedFile(FileDialog fileDialog, const std::string&
 {
 	if (fileDialog == FileDialog::OPEN_MESH)
 	{
-		Model3D* model = (new DrawMesh())->loadModelOBJ(filename);
-		model->moveGeometryToOrigin();
+		TriangleModel* triangleModel = new TriangleModel(filename);
+		Model3D* model = (new DrawMesh(*triangleModel))->overrideModelName()->moveGeometryToOrigin();
 		sceneContent->addNewModel(model);
+
+		delete triangleModel;
 	}
 }
 
@@ -280,8 +282,8 @@ void AlgGeom::GUI::showLightMenu(SceneContent* sceneContent)
 		GuiUtilities::leaveSpace(2);
 
 		AABB aabb = sceneContent->_sceneAABB;
-		float maxCoordinate = std::max(std::max(aabb.max().x, aabb.max().y), aabb.max().z);
-		float minCoordinate = std::min(std::min(aabb.min().x, aabb.min().y), aabb.min().z);
+		float maxCoordinate = std::max(std::max(aabb.getMax().getX(), aabb.getMax().getY()), aabb.getMax().getZ());
+		float minCoordinate = std::min(std::min(aabb.getMin().getX(), aabb.getMin().getY()), aabb.getMin().getZ());
 
 		ImGui::SliderFloat3("Light Position", &_appState->_lightPosition[0], minCoordinate, maxCoordinate);
 		ImGui::ColorEdit3("Ia", &_appState->_Ia[0]);

@@ -13,7 +13,8 @@
 
 namespace AlgGeom
 {
-    class DrawSegment : public Model3D {
+    class DrawSegment : public Model3D 
+    {
     public:
         DrawSegment(SegmentLine& t);
         DrawSegment(SegmentLine3d& t);

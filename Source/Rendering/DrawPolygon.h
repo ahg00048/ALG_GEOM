@@ -12,7 +12,8 @@
 
 namespace AlgGeom
 {
-    class DrawPolygon : public Model3D {
+    class DrawPolygon : public Model3D 
+    {
     public:
         DrawPolygon(Polygon& polygon);
         DrawPolygon(const DrawPolygon& ddt) = delete;

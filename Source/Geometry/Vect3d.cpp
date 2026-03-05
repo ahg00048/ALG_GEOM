@@ -156,7 +156,7 @@ void Vect3d::getPlane(Vect3d& v, Vect3d& n, float& d) const
 	n.setY(v.getY() - getY());
 	n.setZ(v.getZ() - getZ());
 
-	d = (pow(v.getX(), 2) - pow(getX(), 2) + pow(v.getY(), 2) - pow(getY(), 2) + pow(v.getZ(), 2) - pow(getZ(), 2))
+	d = -(pow(v.getX(), 2) - pow(getX(), 2) + pow(v.getY(), 2) - pow(getY(), 2) + pow(v.getZ(), 2) - pow(getZ(), 2))
 		/ 2.0f;
 }
 

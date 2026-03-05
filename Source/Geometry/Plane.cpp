@@ -32,6 +32,17 @@ void Plane::set(const Vect3d& p, const Vect3d& u, const Vect3d& v, bool arePoint
 	}
 }
 
+void Plane::setFromEmplicit(Vect3d n, float d)
+{
+	Vect3d a(-d / n.getX(), 0.0, 0.0);
+	Vect3d b(0.0, -d / n.getY(), 0.0);
+	Vect3d c(0.0, 0.0, -d / n.getZ());
+
+	_a = a;
+	_b = b;
+	_c = c;
+}
+
 bool Plane::coplanar(Vect3d& point)
 {
 	return (BasicGeometry::equal(distance(point), 0.0));

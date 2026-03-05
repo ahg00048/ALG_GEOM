@@ -521,7 +521,7 @@ void AlgGeom::SceneContent::pr2A_B_C()
     float pointSize = 5.0f;
     float lineWidth = 3.0f;
     PointCloud3d* pc = new PointCloud3d(pcSize, 2.0f);
-    
+
     std::vector<Vect3d> pcPoints = pc->getPoints();
     DrawPointCloud* drPc = new DrawPointCloud(*pc);
     AABB pcAABB = drPc->getAABB();
@@ -531,7 +531,7 @@ void AlgGeom::SceneContent::pr2A_B_C()
     Line3d* l1 = new Line3d(pcPoints[RandomUtilities::getUniformRandomInt(0, pcSize)], pcPoints[RandomUtilities::getUniformRandomInt(0, pcSize)]);
     RayLine3d* r1 = new RayLine3d(pcPoints[RandomUtilities::getUniformRandomInt(0, pcSize)], pcPoints[RandomUtilities::getUniformRandomInt(0, pcSize)]);
     SegmentLine3d* s1 = new SegmentLine3d(pcPoints[RandomUtilities::getUniformRandomInt(0, pcSize)], pcPoints[RandomUtilities::getUniformRandomInt(0, pcSize)]);
-    
+
     this->addNewModel((new DrawLine(*l1))->setLineColor(vec3(1.0f, 0.0f, 1.0f))->setLineWidth(lineWidth)->overrideModelName());     // purple
     this->addNewModel((new DrawSegment(*s1))->setLineColor(vec3(0.0f, 1.0f, 1.0f))->setLineWidth(lineWidth)->overrideModelName());  // yellow
     this->addNewModel((new DrawRay(*r1))->setLineColor(vec3(0.0f, 1.0f, 0.0f))->setLineWidth(lineWidth)->overrideModelName());      // green
@@ -561,7 +561,7 @@ void AlgGeom::SceneContent::pr2A_B_C()
     double dist4 = r1->distance(pointV2);
     std::cout << std::format(fmt2, "2.a.6");
     std::cout << std::format(fmt1, "s1", "v1", dist3);
-    std::cout << std::format(fmt1, "r1", "v2", dist4);
+    std::cout << std::format(fmt1, "r1", "v2", dist4) << std::endl;
 
     // 7 - Calcula y dibuja la caja AABB de la nube de puntos. -- HECHO
     this->addNewModel((new DrawAABB(pcAABB))->setLineColor(vec3(1.0f, 1.0f, 1.0f))->setLineWidth(lineWidth)->overrideModelName());
@@ -573,7 +573,7 @@ void AlgGeom::SceneContent::pr2A_B_C()
     for (Vect3d& v : pcPoints)
     {
         if (BasicGeometry::equal(aabbMax.getX(), static_cast<float>(v.getX())) || // al ser obtenido el aabb a traves del ya procesado VAO el cual utiliza floats en vez de double, es necesario el cast a float para conservar precision
-            BasicGeometry::equal(aabbMax.getY(), static_cast<float>(v.getY())) || 
+            BasicGeometry::equal(aabbMax.getY(), static_cast<float>(v.getY())) ||
             BasicGeometry::equal(aabbMax.getZ(), static_cast<float>(v.getZ())))
         {
             this->addNewModel((new DrawPoint(v))->setPointColor(vec3(0.0f, 0.0f, 0.0f))->setPointSize(pointSize * 3.0f)->overrideModelName());
@@ -581,9 +581,9 @@ void AlgGeom::SceneContent::pr2A_B_C()
             if (BasicGeometry::equal(aabbMax.getY(), static_cast<float>(v.getY())))
                 debugVect = v;
         }
-        else if (   BasicGeometry::equal(aabbMin.getX(), static_cast<float>(v.getX())) ||
-                    BasicGeometry::equal(aabbMin.getY(), static_cast<float>(v.getY())) ||
-                    BasicGeometry::equal(aabbMin.getZ(), static_cast<float>(v.getZ())))
+        else if (BasicGeometry::equal(aabbMin.getX(), static_cast<float>(v.getX())) ||
+            BasicGeometry::equal(aabbMin.getY(), static_cast<float>(v.getY())) ||
+            BasicGeometry::equal(aabbMin.getZ(), static_cast<float>(v.getZ())))
         {
             this->addNewModel((new DrawPoint(v))->setPointColor(vec3(0.0f, 0.0f, 0.0f))->setPointSize(pointSize * 3.0f)->overrideModelName());
         }
@@ -596,7 +596,7 @@ void AlgGeom::SceneContent::pr2A_B_C()
     Vect3d pl1P2(aabbMin.getX(), aabbMax.getY(), aabbMax.getZ());
     Vect3d pl1P3(aabbMin.getX(), aabbMax.getY(), aabbMin.getZ());
     Plane* pl1 = new Plane(pl1P1, pl1P2, pl1P3, true);
-    
+
     Vect3d pointV3;
     double minDist = std::numeric_limits<double>::max();
     for (Vect3d& v : pcPoints)
@@ -611,7 +611,7 @@ void AlgGeom::SceneContent::pr2A_B_C()
         }
     }
 
-    vec4 pl1Color = vec4(0.0f, 0.5f, 0.0f, 1.0f);
+    vec4 pl1Color(0.0f, 0.5f, 0.0f, 1.0f);
     this->addNewModel((new DrawPlane(*pl1))->setTriangleColor(pl1Color)->setLineColor(pl1Color)->overrideModelName());              // dim green
     this->addNewModel((new DrawPoint(pointV3))->setPointColor(pl1Color)->setPointSize(pointSize * 5.0f)->overrideModelName());      // dim green
 
@@ -629,8 +629,7 @@ void AlgGeom::SceneContent::pr2A_B_C()
         randPoint3 = pcPoints[RandomUtilities::getUniformRandomInt(0, pcSize - 1)];
 
         pl2->set(randPoint1, randPoint2, randPoint3, true);
-    } 
-    while (!pl2->intersect(*pl1, *interLine));
+    } while (!pl2->intersect(*pl1, *interLine));
 
     vec4 pl2Color = vec4(0.0f, 0.0f, 0.5f, 1.0f);
     this->addNewModel((new DrawPlane(*pl2))->setTriangleColor(pl2Color)->setLineColor(pl2Color)->overrideModelName());              // dim blue
@@ -650,27 +649,51 @@ void AlgGeom::SceneContent::pr2A_B_C()
 
     // 4 - Reflejar el punto V3 en el plano P y pintarlo de otro color. 5 -- HECHO
     Vect3d reflectedPoint = pl2->reflectedPoint(pointV3);
-    
+
     vec3 reflPColor(1.0f);
     this->addNewModel((new DrawPoint(reflectedPoint))->setPointColor(reflPColor)->setPointSize(pointSize * 3.0f)->overrideModelName());        // gold like color
 
-    // 5 - Obtener los puntos más alejados de la nube de puntos y pintar el plano equidistante entre ambos. --
-    Vect3d pcMax1;
-    Vect3d pcMax2;
+    // 5 - Obtener los puntos más alejados de la nube de puntos y pintar el plano equidistante entre ambos. -- HECHO
+    int pcMax1;
+    int pcMax2;
     Vect3d pl3N;
     float pl3D = 0.0;
-    pcMax1.getPlane(pcMax2, pl3N, pl3D);
+    pc->getMostDistanced(pcMax1, pcMax2);
+    pcPoints[pcMax1].getPlane(pcPoints[pcMax2], pl3N, pl3D);
     Plane* pl3 = new Plane();
+    pl3->setFromEmplicit(pl3N, pl3D);
+
+    vec4 pl3Color(0.5f, 1.0f, 0.5f, 1.0f);
+    this->addNewModel((new DrawPlane(*pl3))->setTriangleColor(pl3Color)->setLineColor(pl3Color)->overrideModelName());                                 // 
+    this->addNewModel((new DrawPoint(pcPoints[pcMax1]))->setPointColor(pl3Color)->setPointSize(pointSize * 3.0f)->overrideModelName());                // 
+    this->addNewModel((new DrawPoint(pcPoints[pcMax2]))->setPointColor(pl3Color)->setPointSize(pointSize * 3.0f)->overrideModelName());                // 
 
     // PR2.C --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    // 1 - Dibujar la nube de puntos de diferente color según estén en la parte positiva o negativa del plano A. 
+    // 1 - Dibujar la nube de puntos de diferente color según estén en la parte positiva o negativa del plano A. -- HECHO
+    Vect3d triP1 = pl2->getPointA(), triP2 = pl2->getPointB(), triP3 = pl2->getPointC();
+    Triangle3d* tri = new Triangle3d(triP1, triP2, triP3);
+    vec3 negColor(1.0f);                            // White
+    vec3 posColor(0.0f);                            // Black
+
+    for (Vect3d& v : pcPoints)
+    {
+        if (tri->classify(v) == Triangle3d::POSITIVE)
+        {
+            this->addNewModel((new DrawPoint(v))->setPointColor(posColor)->setPointSize(pointSize * 1.5f)->overrideModelName());
+        } 
+        else
+        {
+            this->addNewModel((new DrawPoint(v))->setPointColor(negColor)->setPointSize(pointSize * 1.5f)->overrideModelName());
+        }
+    }
 
     // free resources
     delete pl1;
     delete pl2;
     delete pl3;
     delete l3;
+    delete tri;
 
     delete pc;
     delete l1;

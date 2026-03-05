@@ -72,6 +72,8 @@ public:
 
 	void set(const Vect3d& p, const Vect3d& u, const Vect3d& v, bool arePoints);
 	
+	void setFromEmplicit(Vect3d n, float d);
+
 	/**
 	*	@brief Returns true if p is in the plane.
 	*/
@@ -81,6 +83,10 @@ public:
 	*	@brief Distance between the plane and the point.
 	*/
 	double distance(Vect3d& point);
+
+	Vect3d getPointA() { return _a; }
+	Vect3d getPointB() { return _b; }
+	Vect3d getPointC() { return _c; }
 
 	/**
 	*	@brief Returns A in AX + BY + CZ + D = 0.

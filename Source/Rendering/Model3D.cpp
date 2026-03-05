@@ -200,6 +200,13 @@ void AlgGeom::Model3D::buildVao(Component* component)
 void AlgGeom::Model3D::calculateAABB()
 {
     _aabb = AABB();
+    for (auto& component : _components)
+        if (!component->_vertices.empty())
+        {
+            vec3 pos = component->_vertices[0]._position;
+            _aabb.setMax(Vect3d(pos));
+            _aabb.setMin(Vect3d(pos));
+        }
 
     for (auto& component : _components)
         for (VAO::Vertex& vertex : component->_vertices)

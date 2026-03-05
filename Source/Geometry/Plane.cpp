@@ -4,6 +4,19 @@
 
 
 Plane::Plane(Vect3d& p, Vect3d& u, Vect3d& v, bool arePoints)
+{	
+	set(p, u, v, arePoints);
+}
+
+Plane::Plane(const Plane& plane) : _a(plane._a), _b(plane._b), _c(plane._c)
+{
+}
+
+Plane::~Plane()
+{
+}
+
+void Plane::set(const Vect3d& p, const Vect3d& u, const Vect3d& v, bool arePoints)
 {
 	if (!arePoints)			// Vectors: pi = p + u * lambda + v * mu 
 	{
@@ -19,14 +32,6 @@ Plane::Plane(Vect3d& p, Vect3d& u, Vect3d& v, bool arePoints)
 	}
 }
 
-Plane::Plane(const Plane& plane) : _a(plane._a), _b(plane._b), _c(plane._c)
-{
-}
-
-Plane::~Plane()
-{
-}
-
 bool Plane::coplanar(Vect3d& point)
 {
 	return (BasicGeometry::equal(distance(point), 0.0));
@@ -35,24 +40,27 @@ bool Plane::coplanar(Vect3d& point)
 double Plane::distance(Vect3d& point)
 {
 	Vect3d n = getNormal();
-	double t = -(n.dot(point) + getD()) / (n.dot(n));
-
-	return n.scalarMul(t).module();
+	double t =	-(n.dot(point) + getD()) / n.dot(n);
+	double dist = n.scalarMul(t).module();
+	return dist;
 }
 
 double Plane::getA()
 {
-	return (BasicGeometry::determinant2x2(_c.getZ() - _a.getZ(), _c.getY() - _a.getY(), _b.getY() - _a.getY(), _b.getZ() - _a.getZ()));
+	return (BasicGeometry::determinant2x2(	_c.getZ() - _a.getZ(), _c.getY() - _a.getY(), 
+											_b.getZ() - _a.getZ(), _b.getY() - _a.getY()));
 }
 
 double Plane::getB()
 {
-	return (BasicGeometry::determinant2x2(_c.getX() - _a.getX(), _c.getZ() - _a.getZ(), _b.getZ() - _a.getZ(), _b.getX() - _a.getX()));
+	return (BasicGeometry::determinant2x2(	_c.getX() - _a.getX(), _c.getZ() - _a.getZ(), 
+											_b.getX() - _a.getX(), _b.getZ() - _a.getZ()));
 }
 
 double Plane::getC()
 {
-	return (BasicGeometry::determinant2x2(_c.getY() - _a.getY(), _c.getX() - _a.getX(), _b.getX() - _a.getX(), _b.getY() - _a.getY()));
+	return (BasicGeometry::determinant2x2(	_c.getY() - _a.getY(), _c.getX() - _a.getX(), 
+											_b.getY() - _a.getY(), _b.getX() - _a.getX()));
 }
 
 Vect3d Plane::getNormal()
@@ -60,7 +68,7 @@ Vect3d Plane::getNormal()
 	Vect3d v1 = _a.sub(_b);
 	Vect3d v2 = _a.sub(_c);
 	
-	return v1.xProduct(v2).normalize();
+	return v1.xProduct(v2);
 }
 
 bool Plane::intersect(Plane& plane, Line3d& line)
@@ -137,7 +145,7 @@ Plane& Plane::operator=(const Plane& plane)
 
 std::vector<Vect3d> Plane::getDrawingPoints(float t)
 {
-	std::vector<Vect3d> points(6);
+	std::vector<Vect3d> points(7);
 	Vect3d AB = _b.sub(_a);
 	Vect3d AC = _c.sub(_a);
 	Vect3d BC = _c.sub(_b);
@@ -159,6 +167,9 @@ std::vector<Vect3d> Plane::getDrawingPoints(float t)
 
 	//cb
 	points.push_back((BC.scalarMul(-t)).add(_b));
+
+	//ab
+	points.push_back((AB.scalarMul(t)).add(_b));
 
 	return points;
 }

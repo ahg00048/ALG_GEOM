@@ -39,6 +39,8 @@ protected:
 	virtual bool isTvalid(double t) { return (t >= 0); }
 
 public:
+	RayLine3d() = default;
+
 	/**
 	*	@brief Constructor.
 	*/

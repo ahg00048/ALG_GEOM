@@ -49,6 +49,8 @@ protected:
 	Vect3d _a, _b, _c;
 
 public:
+	Plane() = default;
+
 	/**
 	*
 	*	@param p in pi = p + u * lambda + v * mu -> r from the points (R, S, T).
@@ -68,6 +70,8 @@ public:
 	*/
 	virtual ~Plane();
 
+	void set(const Vect3d& p, const Vect3d& u, const Vect3d& v, bool arePoints);
+	
 	/**
 	*	@brief Returns true if p is in the plane.
 	*/

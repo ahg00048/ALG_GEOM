@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "AABB.h"
 
-AABB::AABB()
+AABB::AABB() : _min(-1.0f, -1.0f, -1.0f), _max(1.0f, 1.0f, 1.0f)
 {
 }
 

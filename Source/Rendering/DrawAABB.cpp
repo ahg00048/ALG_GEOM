@@ -5,8 +5,8 @@
 AlgGeom::DrawAABB::DrawAABB(AABB& aabb) : Model3D()
 {
     Component* component = this->getVoxel();
-    vec3 aabbCenter(aabb.getCenter().getX(), aabb.getCenter().getY(), aabb.getCenter().getZ());
-    vec3 extent(aabb.getExtent().getX(), aabb.getExtent().getY(), aabb.getExtent().getZ());
+    vec3 aabbCenter(aabb.getCenter());
+    vec3 extent(aabb.getExtent());
 
     for (VAO::Vertex& vertex : component->_vertices)
     {

@@ -40,8 +40,8 @@ double Line3d::distance(Line3d& line)
 double Line3d::distance(SegmentLine3d& segm)
 {
 	Vect3d segOrig = segm.getOrigin();
-	Vect3d lDir = (_dest.sub(_orig)).normalize();
-	Vect3d segDir = (segm.getDestination().sub(segOrig)).normalize();
+	Vect3d lDir = (_dest.sub(_orig));
+	Vect3d segDir = (segm.getDestination().sub(segOrig));
 	
 	Vect3d u = _orig.sub(segOrig);
 	double a = lDir.dot(lDir);
@@ -52,15 +52,16 @@ double Line3d::distance(SegmentLine3d& segm)
 	double det = a * c - b * b;
 	
 	double sDenom = det;
-	double sNum = 0.0;
-	double tNum = 0.0;
-	double tDenom = 0.0;
+	double tDenom = det;
+	double sNum;
+	double tNum;
 
 	if (det < BasicGeometry::EPSILON)
 	{
 		sNum = 0.0;
 		tNum = e;
 		tDenom = c;
+		sDenom = a;
 	} 
 	else
 	{
@@ -77,7 +78,7 @@ double Line3d::distance(SegmentLine3d& segm)
 	else if (tNum > tDenom)
 	{
 		tNum = tDenom;
-		sNum = -d + b;
+		sNum = b - d;
 		sDenom = a;
 	}
 
@@ -89,6 +90,7 @@ double Line3d::distance(SegmentLine3d& segm)
 	Vect3d A1 = _orig.add(sLDir);
 	Vect3d A2 = segOrig.add(tSegDir);
 	Vect3d v = A1.sub(A2);
+
 	return v.module(); //dot?
 }
 

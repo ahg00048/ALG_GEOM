@@ -86,12 +86,12 @@ public:
 	/**
 	*	@brief Modifies the minimum point.
 	*/
-	void setMin(Vect3d& min) { _min = min; }
+	void setMin(const Vect3d& min) { _min = min; }
 
 	/**
 	*	@brief Modifies the maximum point.
 	*/
-	void setMax(Vect3d& max) { _max = max; }
+	void setMax(const Vect3d& max) { _max = max; }
 
 	Vect3d getSize() { return _max.sub(_min); }
 

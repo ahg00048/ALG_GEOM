@@ -8,7 +8,7 @@ std::unordered_set<std::string> AlgGeom::Model3D::USED_NAMES;
 
 // Public methods
 
-AlgGeom::Model3D::Model3D(): _modelMatrix(1.0f)
+AlgGeom::Model3D::Model3D() : _modelMatrix(1.0f)
 {
     this->overrideModelName();
 }
@@ -30,6 +30,8 @@ bool AlgGeom::Model3D::belongsModel(Component* component)
 
 void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* matrixInformation, ApplicationState* appState, GLuint primitive)
 {
+    shader->setSubroutineUniform(GL_VERTEX_SHADER, "instanceUniform", "singleInstanceUniform");
+
     for (auto& component : _components)
     {
         if (component->_enabled && component->_vao)
@@ -45,7 +47,7 @@ void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* ma
                     shader->setSubroutineUniform(GL_FRAGMENT_SHADER, "kadUniform", "getUniformColor");
                 }
                 else
-                {
+                {   
                     Texture* checkerPattern = TextureList::getInstance()->getTexture(CHECKER_PATTERN_PATH);
                     checkerPattern->applyTexture(shader, 0, "texKdSampler");
                     shader->setSubroutineUniform(GL_FRAGMENT_SHADER, "kadUniform", "getTextureColor");
@@ -72,7 +74,7 @@ void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* ma
             }
 
             if (!component->_activeRendering[rendering]) continue;
-            
+
             shader->setUniform("mModelViewProj", matrixInformation->multiplyMatrix(MatrixRenderInformation::VIEW_PROJECTION, this->_modelMatrix));
             shader->applyActiveSubroutines();
 
@@ -86,14 +88,14 @@ void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* ma
 
 AlgGeom::Model3D* AlgGeom::Model3D::moveGeometryToOrigin(const mat4& origMatrix, float maxScale)
 {
-    AABB aabb = this->getAABB();
+    //AABB aabb = this->getAABB();
 
-    vec3 translate = -aabb.center();
-    vec3 extent = aabb.extent();
-    float maxScaleAABB = std::max(extent.x, std::max(extent.y, extent.z));
-    vec3 scale = (maxScale < FLT_MAX) ? ((maxScale > maxScaleAABB) ? vec3(1.0f) : vec3(maxScale / maxScaleAABB)) : vec3(1.0f);
+    //vec3 translate = -aabb.center();
+    //vec3 extent = aabb.extent();
+    //float maxScaleAABB = std::max(extent.x, std::max(extent.y, extent.z));
+    //vec3 scale = (maxScale < FLT_MAX) ? ((maxScale > maxScaleAABB) ? vec3(1.0f) : vec3(maxScale / maxScaleAABB)) : vec3(1.0f);
 
-    _modelMatrix = glm::scale(glm::mat4(1.0f), scale) * glm::translate(glm::mat4(1.0f), translate) * origMatrix;
+    //_modelMatrix = glm::scale(glm::mat4(1.0f), scale) * glm::translate(glm::mat4(1.0f), translate) * origMatrix;
 
     return this;
 }
@@ -197,14 +199,19 @@ void AlgGeom::Model3D::buildVao(Component* component)
 
 void AlgGeom::Model3D::calculateAABB()
 {
-  _aabb = AABB();
+    _aabb = AABB();
+    for (auto& component : _components)
+        if (!component->_vertices.empty())
+        {
+            vec3 pos = component->_vertices[0]._position;
+            _aabb.setMax(Vect3d(pos));
+            _aabb.setMin(Vect3d(pos));
+        }
 
-  for (auto& component : _components)
-    for (VAO::Vertex& vertex : component->_vertices)
-      _aabb.update(vertex._position);
+    for (auto& component : _components)
+        for (VAO::Vertex& vertex : component->_vertices)
+            _aabb.update(vertex._position);
 }
-
-// Protected methods
 
 AlgGeom::Model3D::Component* AlgGeom::Model3D::getVoxel()
 {
@@ -212,7 +219,7 @@ AlgGeom::Model3D::Component* AlgGeom::Model3D::getVoxel()
 
     // Geometry
     {
-	    constexpr vec3 minPosition(-.5f), maxPosition(.5f);
+        const vec3 minPosition(-.5f), maxPosition(.5f);
         const std::vector<vec3> points
         {
             vec3(minPosition[0], minPosition[1], maxPosition[2]),		vec3(maxPosition[0], minPosition[1], maxPosition[2]),
@@ -250,6 +257,88 @@ AlgGeom::Model3D::Component* AlgGeom::Model3D::getVoxel()
     }
 
     return component;
+}
+
+AlgGeom::Model3D::MatrixRenderInformation::MatrixRenderInformation()
+{
+    for (mat4& matrix : _matrix)
+    {
+        matrix = mat4(1.0f);
+    }
+}
+
+void AlgGeom::Model3D::MatrixRenderInformation::undoMatrix(MatrixType type)
+{
+    if (_heapMatrices[type].empty())
+    {
+        _matrix[type] = mat4(1.0f);
+    }
+    else
+    {
+        _matrix[type] = *(--_heapMatrices[type].end());
+        _heapMatrices[type].erase(--_heapMatrices[type].end());
+    }
+}
+
+void AlgGeom::Model3D::Component::completeTopology()
+{
+    if (!this->_indices[VAO::IBO_TRIANGLE].empty() && this->_indices[VAO::IBO_LINE].empty())
+    {
+        this->generateWireframe();
+    }
+
+    if (!this->_indices[VAO::IBO_LINE].empty() && this->_indices[VAO::IBO_POINT].empty())
+    {
+        this->generatePointCloud();
+    }
+}
+
+void AlgGeom::Model3D::Component::generateWireframe()
+{
+    std::unordered_map<int, std::unordered_set<int>>* segmentIncluded = new std::unordered_map<int, std::unordered_set<int>>;
+    auto isIncluded = [&](int index1, int index2) -> bool
+        {
+            std::unordered_map<int, std::unordered_set<int>>::iterator it;
+
+            if ((it = segmentIncluded->find(index1)) != segmentIncluded->end())
+            {
+                if (it->second.find(index2) != it->second.end())
+                {
+                    return true;
+                }
+            }
+
+            if ((it = segmentIncluded->find(index2)) != segmentIncluded->end())
+            {
+                if (it->second.find(index1) != it->second.end())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+    const size_t numIndices = this->_indices[VAO::IBO_TRIANGLE].size();
+
+    for (size_t i = 0; i < numIndices; i += 4)
+    {
+        for (size_t j = 0; j < 3; ++j)
+        {
+            if (!isIncluded(this->_indices[VAO::IBO_TRIANGLE][i + j], this->_indices[VAO::IBO_TRIANGLE][(j + 1) % 3 + i]))
+            {
+                this->_indices[VAO::IBO_LINE].push_back(this->_indices[VAO::IBO_TRIANGLE][i + j]);
+                this->_indices[VAO::IBO_LINE].push_back(this->_indices[VAO::IBO_TRIANGLE][(j + 1) % 3 + i]);
+                this->_indices[VAO::IBO_LINE].push_back(RESTART_PRIMITIVE_INDEX);
+            }
+        }
+    }
+}
+
+void AlgGeom::Model3D::Component::generatePointCloud()
+{
+    this->_indices[VAO::IBO_POINT].resize(this->_vertices.size());
+    std::iota(this->_indices[VAO::IBO_POINT].begin(), this->_indices[VAO::IBO_POINT].end(), 0);
 }
 
 void AlgGeom::Model3D::loadModelBinaryFile(const std::string& path)
@@ -302,7 +391,7 @@ void AlgGeom::Model3D::writeBinaryFile(const std::string& path)
     size_t numComponents = _components.size();
     fout.write((char*)&numComponents, sizeof(size_t));
 
-    for (auto& component: _components)
+    for (auto& component : _components)
     {
         size_t numVertices = component->_vertices.size();
 
@@ -313,7 +402,7 @@ void AlgGeom::Model3D::writeBinaryFile(const std::string& path)
         {
             size_t numIndices = component->_indices[topology].size();
             fout.write((char*)&numIndices, sizeof(size_t));
-            if (numIndices) 
+            if (numIndices)
                 fout.write((char*)component->_indices[topology].data(), numIndices * sizeof(GLuint));
         }
 
@@ -321,86 +410,4 @@ void AlgGeom::Model3D::writeBinaryFile(const std::string& path)
     }
 
     fout.close();
-}
-
-AlgGeom::Model3D::MatrixRenderInformation::MatrixRenderInformation()
-{
-    for (mat4& matrix : _matrix)
-    {
-        matrix = mat4(1.0f);
-    }
-}
-
-void AlgGeom::Model3D::MatrixRenderInformation::undoMatrix(MatrixType type)
-{
-    if (_heapMatrices[type].empty())
-    {
-        _matrix[type] = mat4(1.0f);
-    }
-    else
-    {
-        _matrix[type] = *(--_heapMatrices[type].end());
-        _heapMatrices[type].erase(--_heapMatrices[type].end());
-    }
-}
-
-void AlgGeom::Model3D::Component::completeTopology()
-{
-    if (!this->_indices[VAO::IBO_TRIANGLE].empty() && this->_indices[VAO::IBO_LINE].empty())
-    {
-        this->generateWireframe();
-    }
-
-    if (!this->_indices[VAO::IBO_LINE].empty() && this->_indices[VAO::IBO_POINT].empty())
-    {
-        this->generatePointCloud();
-    }
-}
-
-void AlgGeom::Model3D::Component::generateWireframe()
-{
-    std::unordered_map<int, std::unordered_set<int>>* segmentIncluded = new std::unordered_map<int, std::unordered_set<int>>;
-    auto isIncluded = [&](int index1, int index2) -> bool
-    {
-        std::unordered_map<int, std::unordered_set<int>>::iterator it;
-
-        if ((it = segmentIncluded->find(index1)) != segmentIncluded->end())
-        {
-            if (it->second.find(index2) != it->second.end())
-            {
-                return true;
-            }
-        }
-
-        if ((it = segmentIncluded->find(index2)) != segmentIncluded->end())
-        {
-            if (it->second.find(index1) != it->second.end())
-            {
-                return true;
-            }
-        }
-
-        return false;
-    };
-
-    const size_t numIndices = this->_indices[VAO::IBO_TRIANGLE].size();
-
-    for (size_t i = 0; i < numIndices; i += 4)
-    {
-        for (size_t j = 0; j < 3; ++j)
-        {
-            if (!isIncluded(this->_indices[VAO::IBO_TRIANGLE][i + j], this->_indices[VAO::IBO_TRIANGLE][(j + 1) % 3 + i]))
-            {
-                this->_indices[VAO::IBO_LINE].push_back(this->_indices[VAO::IBO_TRIANGLE][i + j]);
-                this->_indices[VAO::IBO_LINE].push_back(this->_indices[VAO::IBO_TRIANGLE][(j + 1) % 3 + i]);
-                this->_indices[VAO::IBO_LINE].push_back(RESTART_PRIMITIVE_INDEX);
-            }
-        }
-    }
-}
-
-void AlgGeom::Model3D::Component::generatePointCloud()
-{
-    this->_indices[VAO::IBO_POINT].resize(this->_vertices.size());
-    std::iota(this->_indices[VAO::IBO_POINT].begin(), this->_indices[VAO::IBO_POINT].end(), 0);
 }

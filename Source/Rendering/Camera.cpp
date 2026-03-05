@@ -11,8 +11,8 @@ AlgGeom::Camera::Camera(uint16_t width, uint16_t height, bool is2D) : _backupCam
 	this->_properties._cameraType = CameraProjection::PERSPECTIVE;
 	this->_properties._2d = is2D;
 
-	this->_properties._eye = vec3(0.0f, 3.0f, 10.0f);
-	this->_properties._lookAt = vec3(0.0f, 3.0f, 0.0f);
+	this->_properties._eye = vec3(0.0f, 0.0f, 10.0f);
+	this->_properties._lookAt = vec3(0.0f, 0.0f, 0.0f);
 	this->_properties._up = vec3(0.0f, 1.0f, 0.0f);
 
 	this->_properties._zNear = 0.1f;
@@ -52,8 +52,11 @@ void AlgGeom::Camera::track(Model3D* model)
 {
 	AABB aabb = model->getAABB();
 
-	this->setLookAt(aabb.center());
-	this->setPosition(aabb.min() + vec3(.0f, aabb.extent().y, 1.0f) - vec3(aabb.extent().x, .0f, .0) * (1 + (1.0f / std::max(aabb.size().x, std::max(aabb.size().y, aabb.size().z))) * 4.0f));
+	//this->setLookAt(aabb.getCenter());
+	//this->setPosition(	vec3(aabb.getMin()) + 
+	//					vec3(.0f, aabb.getExtent().getY(), 1.0f) 
+	//				  - vec3(aabb.getExtent().getX(), .0f, .0f) *
+	//					static_cast<float>(1.0f + (1.0f / std::max(aabb.getSize().getX(), std::max(aabb.getSize().getY(), aabb.getSize().getZ()))) * 4.0f));
 }
 
 void AlgGeom::Camera::saveCamera()

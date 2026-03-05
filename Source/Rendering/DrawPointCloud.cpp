@@ -3,10 +3,9 @@
 
 // Public methods
 
-AlgGeom::DrawPointCloud::DrawPointCloud (PointCloud &pointCloud): Model3D(), _pointCloud(pointCloud)
+AlgGeom::DrawPointCloud::DrawPointCloud(PointCloud& pointCloud) : Model3D()
 {
-    // 
-    size_t numPoints = _pointCloud.size();
+    size_t numPoints = pointCloud.size();
     Component* component = new Component;
 
     for (unsigned vertexIdx = 0; vertexIdx < numPoints; vertexIdx++) {
@@ -18,7 +17,23 @@ AlgGeom::DrawPointCloud::DrawPointCloud (PointCloud &pointCloud): Model3D(), _po
     }
 
     this->_components.push_back(std::unique_ptr<Component>(component));
-
-    this->calculateAABB();
     this->buildVao(component);
+}
+
+AlgGeom::DrawPointCloud::DrawPointCloud(PointCloud3d& pointCloud) : Model3D()
+{
+    size_t numPoints = pointCloud.size();
+    Component* component = new Component;
+
+    for (unsigned vertexIdx = 0; vertexIdx < numPoints; vertexIdx++) {
+
+        Vect3d point = pointCloud.getPoint(vertexIdx);
+
+        component->_vertices.push_back(VAO::Vertex{ vec3(point.getX(), point.getY(), point.getZ()) });
+        component->_indices[VAO::IBO_POINT].push_back(vertexIdx);
+    }
+
+    this->_components.push_back(std::unique_ptr<Component>(component));
+    this->buildVao(component);
+    this->calculateAABB();
 }

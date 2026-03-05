@@ -8,17 +8,16 @@
  */
 
 #include "Line.h"
+#include "Line3d.h"
 #include "Model3D.h"
 
 namespace AlgGeom
 {
     class DrawLine : public Model3D 
     {
-    protected:
-        Line _line;
-
     public:
         DrawLine(Line& t);
+        DrawLine(Line3d& t);
         DrawLine(const DrawLine& drawLine) = delete;
         ~DrawLine() override {};
     };

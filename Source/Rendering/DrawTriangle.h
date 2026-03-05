@@ -8,6 +8,7 @@
  */
 
 #include "Triangle.h"
+#include "Triangle3d.h"
 #include "Model3D.h"
 
 
@@ -15,11 +16,9 @@ namespace AlgGeom
 {
     class DrawTriangle : public Model3D
     {
-    protected:
-        Triangle _triangle;
-
     public:
         DrawTriangle(Triangle& t);
+        DrawTriangle(Triangle3d& t);
         DrawTriangle(const DrawTriangle& drawTriangle) = delete;
         ~DrawTriangle() override {};
     };

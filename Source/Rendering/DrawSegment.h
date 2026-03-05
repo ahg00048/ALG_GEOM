@@ -8,16 +8,16 @@
  */
 
 #include "SegmentLine.h"
+#include "SegmentLine3d.h"
 #include "Model3D.h"
 
 namespace AlgGeom
 {
-    class DrawSegment : public Model3D {
-    protected:
-        SegmentLine _segment;
-
+    class DrawSegment : public Model3D 
+    {
     public:
         DrawSegment(SegmentLine& t);
+        DrawSegment(SegmentLine3d& t);
         DrawSegment(const DrawSegment& drawSegment) = delete;
         ~DrawSegment() override {};
     };

@@ -12,10 +12,8 @@
 
 namespace AlgGeom
 {
-    class DrawPolygon : public Model3D {
-    protected:
-        Polygon _polygon;
-
+    class DrawPolygon : public Model3D 
+    {
     public:
         DrawPolygon(Polygon& polygon);
         DrawPolygon(const DrawPolygon& ddt) = delete;

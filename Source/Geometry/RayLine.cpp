@@ -24,8 +24,8 @@ float RayLine::distToPoint(Vect2d& vector)
 	Vect2d pa = vector - _orig;
 	float t = (d.dot(pa) /
 				d.getModule());
-
-	return (t <= 0) ? pa.getModule() : (vector - (d.scalarMult(t) + _orig)).getModule();
+	
+	return (BasicGeometry::lessOrEqual(t, 0)) ? pa.getModule() : (vector - (d.scalarMult(t) + _orig)).getModule();
 }
 
 bool RayLine::incorrectSegmentIntersection(SegmentLine& segment)
@@ -59,8 +59,8 @@ bool RayLine::intersects(const RayLine& r, Vect2d& v)
 	Vect2d lineDest = r.getB();
 
 	if (SegmentLine::intersects(lineOrig, lineDest, t, s) &&
-					0 <= s &&
-					0 <= t)
+		BasicGeometry::lessOrEqual(0, s) &&
+		BasicGeometry::lessOrEqual(0 , t))
 	{
 		v = getPoint(s);
 		return true;
@@ -78,7 +78,7 @@ bool RayLine::intersects(const Line& l, Vect2d& v)
 	Vect2d lineDest = l.getB();
 
 	if (SegmentLine::intersects(lineOrig, lineDest, t, s) &&
-		0 <= s)
+		BasicGeometry::lessOrEqual(0, s))
 	{
 		v = getPoint(s);
 		return true;
@@ -96,8 +96,8 @@ bool RayLine::intersects(const SegmentLine& sg, Vect2d& v)
 	Vect2d lineDest = sg.getB();
 
 	if (SegmentLine::intersects(lineOrig, lineDest, t, s) &&
-		(0 <= s) &&
-		(0 <= t && t <= 1))
+		BasicGeometry::lessOrEqual(0, s) &&
+		(BasicGeometry::lessOrEqual(0, t) && BasicGeometry::lessOrEqual(t, 1)))
 	{
 		v = getPoint(s);
 		return true;

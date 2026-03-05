@@ -55,7 +55,6 @@ public:
 	//Voxelization(TriangleModel* model, const vec3& voxelSize);
 	virtual ~Voxelization();
 
-	AlgGeom::DrawVoxelization* getRenderingObject(bool useColors = true) const;
 	void printData() const;
 };
 

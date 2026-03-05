@@ -23,7 +23,7 @@ double Line::distToPoint(Vect2d& v)
 	Vect2d pa = v - _orig;
 
 	float t = (d.dot(pa) /
-		d.getModule());
+				d.dot(d));
 
 	return (v - (d.scalarMult(t) + _orig)).getModule();
 }
@@ -54,7 +54,7 @@ bool Line::intersects(const RayLine& rayline, Vect2d& intersection)
 	Vect2d lineDest = rayline.getB();
 
 	if (SegmentLine::intersects(lineOrig, lineDest, t, s) && 
-					0 <= t)
+					BasicGeometry::lessOrEqual(0, t))
 	{
 		intersection = getPoint(s);
 		return true;
@@ -72,7 +72,7 @@ bool Line::intersects(const SegmentLine& segment, Vect2d& intersection)
 	Vect2d lineDest = segment.getB();
 
 	if (SegmentLine::intersects(lineOrig, lineDest, t, s) && 
-					(0 <= t && t <= 1))
+					(BasicGeometry::lessOrEqual(0, t)) && BasicGeometry::lessOrEqual(t, 1))
 	{
 		intersection = getPoint(s);
 		return true;

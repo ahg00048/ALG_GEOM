@@ -1,49 +1,37 @@
 #include "stdafx.h"
+#include <assimp/postprocess.h>
 #include "DrawMesh.h"
+#include "Vect2d.h"
 
 // Public methods
 
-AlgGeom::DrawMesh::DrawMesh(): Model3D()
+AlgGeom::DrawMesh::DrawMesh(TriangleModel& triangleModel) : Model3D()
 {
-}
+    std::vector<Vect3d>* vertices = triangleModel.getVertices(), * normals = triangleModel.getNormals();
+    std::vector<Vect2d>* textCoordinates = triangleModel.getTextureCoordinates();
+    std::vector<unsigned>* indices = triangleModel.getIndices();
+    const size_t numFaces = triangleModel.numTriangles();
 
-AlgGeom::DrawMesh::~DrawMesh()
-{
-}
+    Component* component = new Component;
 
-AlgGeom::DrawMesh* AlgGeom::DrawMesh::loadModelOBJ(const std::string& path)
-{
-    std::string binaryFile = path.substr(0, path.find_last_of('.')) + BINARY_EXTENSION;
-
-    if (std::filesystem::exists(binaryFile))
+    for (size_t vertexIdx = 0; vertexIdx < vertices->size(); ++vertexIdx)
     {
-        this->loadModelBinaryFile(binaryFile);
-    }
-    else
-    {
-        const aiScene* scene = _assimpImporter.ReadFile(path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
-
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        {
-            std::cout << "ERROR::ASSIMP::" << _assimpImporter.GetErrorString() << std::endl;
-            return this;
-        }
-
-        std::string shortName = scene->GetShortFilename(path.c_str());
-        std::string folder = path.substr(0, path.length() - shortName.length());
-
-        this->processNode(scene->mRootNode, scene, folder);
-        this->writeBinaryFile(binaryFile);
+        VAO::Vertex vertex{ vec3(vertices->at(vertexIdx).getX(), vertices->at(vertexIdx).getY(), vertices->at(vertexIdx).getZ()),
+                            vec3(normals->at(vertexIdx).getX(), normals->at(vertexIdx).getY(), normals->at(vertexIdx).getZ()) };
+        if (!textCoordinates->empty())
+            vertex._textCoord = vec2(textCoordinates->at(vertexIdx).getX(), textCoordinates->at(vertexIdx).getY());
+        component->_vertices.push_back(vertex);
     }
 
-    for (auto& component : _components)
+    for (size_t faceIdx = 0; faceIdx < numFaces; ++faceIdx)
     {
-        this->buildVao(component.get());
+        component->_indices[VAO::IBO_TRIANGLE].insert(component->_indices[VAO::IBO_TRIANGLE].end(),
+            { indices->at(faceIdx * 3 + 0), indices->at(faceIdx * 3 + 1), indices->at(faceIdx * 3 + 2), RESTART_PRIMITIVE_INDEX });
     }
 
-    this->calculateAABB();
-
-    return this;
+    component->completeTopology();
+    this->buildVao(component);
+    this->_components.push_back(std::unique_ptr<Component>(component));
 }
 
 // Protected methods
@@ -52,7 +40,6 @@ AlgGeom::Model3D::Component* AlgGeom::DrawMesh::processMesh(aiMesh* mesh, const 
 {
     std::vector<VAO::Vertex> vertices(mesh->mNumVertices);
     std::vector<GLuint> indices(mesh->mNumFaces * 4);
-    AABB aabb;
 
     // Vertices
     int numVertices = static_cast<int>(mesh->mNumVertices);
@@ -65,7 +52,6 @@ AlgGeom::Model3D::Component* AlgGeom::DrawMesh::processMesh(aiMesh* mesh, const 
         if (mesh->mTextureCoords[0]) vertex._textCoord = vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 
         vertices[i] = vertex;
-        aabb.update(vertex._position);
     }
 
     // Indices
@@ -81,7 +67,6 @@ AlgGeom::Model3D::Component* AlgGeom::DrawMesh::processMesh(aiMesh* mesh, const 
     Component* component = new Component;
     component->_vertices = std::move(vertices);
     component->_indices[VAO::IBO_TRIANGLE] = std::move(indices);
-    component->_aabb = std::move(aabb);
     component->completeTopology();
 
     return component;
@@ -93,11 +78,43 @@ void AlgGeom::DrawMesh::processNode(aiNode* node, const aiScene* scene, const st
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         _components.push_back(std::unique_ptr<Component>(this->processMesh(mesh, scene, folder)));
-        _aabb.update(_components[_components.size() - 1]->_aabb);
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
         this->processNode(node->mChildren[i], scene, folder);
     }
+}
+
+AlgGeom::DrawMesh* AlgGeom::DrawMesh::loadModelOBJ(const std::string& path)
+{
+    std::string binaryFile = path.substr(0, path.find_last_of('.')) + BINARY_EXTENSION;
+
+    if (std::filesystem::exists(binaryFile))
+    {
+        loadModelBinaryFile(binaryFile);
+    }
+    else
+    {
+        const aiScene* scene = _assimpImporter.ReadFile(path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        {
+            std::cout << "ERROR::ASSIMP::" << _assimpImporter.GetErrorString() << std::endl;
+            return this;
+        }
+
+        std::string shortName = scene->GetShortFilename(path.c_str());
+        std::string folder = path.substr(0, path.length() - shortName.length());
+
+        processNode(scene->mRootNode, scene, folder);
+        writeBinaryFile(binaryFile);
+    }
+
+    for (auto& component : _components)
+    {
+        this->buildVao(component.get());
+    }
+
+    return this;
 }

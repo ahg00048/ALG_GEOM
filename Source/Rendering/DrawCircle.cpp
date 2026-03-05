@@ -3,11 +3,11 @@
 
 // Public methods
 
-AlgGeom::DrawCircle::DrawCircle(Circle& circle, uint32_t numSubdivisions): Model3D(), _circle(circle), _numSubdivisions(numSubdivisions)
+AlgGeom::DrawCircle::DrawCircle(Circle& circle, uint32_t numSubdivisions): Model3D()
 {
     Component* component = new Component;
 
-    Polygon polygon = _circle.getPointsCircle(_numSubdivisions);
+    Polygon polygon = circle.getPointsCircle(numSubdivisions);
     size_t numVertices = polygon.getNumVertices();
 
     for (unsigned vertexIdx = 0; vertexIdx < polygon.getNumVertices(); vertexIdx++) {
@@ -26,6 +26,5 @@ AlgGeom::DrawCircle::DrawCircle(Circle& circle, uint32_t numSubdivisions): Model
     component->completeTopology();
     this->_components.push_back(std::unique_ptr<Component>(component));
 
-    this->calculateAABB();
     this->buildVao(component);
 }

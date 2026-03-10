@@ -107,8 +107,10 @@ Point SegmentLine::getPoint(double t)
 
 bool SegmentLine::impSegmentIntersection(SegmentLine& segment)
 {
-    return _orig.colinear(segment._dest, segment._orig) || segment._orig.colinear(_dest, _orig) || 
-		_dest.colinear(segment._dest, segment._orig) || segment._dest.colinear(_dest, _orig);
+    return	_orig.colinear(segment._dest, segment._orig) || segment._orig.colinear(_dest, _orig) || 
+			_dest.colinear(segment._dest, segment._orig) || segment._dest.colinear(_dest, _orig) ||
+			(_orig.equal(segment._orig) || _dest.equal(segment._orig) || 
+			 _orig.equal(segment._dest) || _dest.equal(segment._dest));
 }
 
 bool SegmentLine::isHorizontal()

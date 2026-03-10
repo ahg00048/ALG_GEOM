@@ -17,15 +17,19 @@ Line::~Line()
 {
 }
 
-double Line::distToPoint(Vect2d& v)
+double Line::distToPoint(Vect2d& vector)
 {
 	Vect2d d(_dest.getX() - _orig.getX(), _dest.getY() - _orig.getY());
-	Vect2d pa = v - _orig;
+	Vect2d pa = vector - _orig;
+	float denom = d.dot(d);
+
+	if (denom == 0.0f)	//_orig y _dest son lo mismo
+		return INFINITY;
 
 	float t = (d.dot(pa) /
-				d.dot(d));
+				denom);
 
-	return (v - (d.scalarMult(t) + _orig)).getModule();
+	return (vector - (d.scalarMult(t) + _orig)).getModule();
 }
 
 bool Line::intersects(const Line& line, Vect2d& intersection)

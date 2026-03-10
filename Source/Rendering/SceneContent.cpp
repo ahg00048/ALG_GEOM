@@ -14,8 +14,8 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    pr2A_B_C();
-    //pr2D();
+    //pr2A_B_C();
+    pr2D();
 }
 
 

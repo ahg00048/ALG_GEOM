@@ -49,7 +49,7 @@ double Line3d::distance(SegmentLine3d& segm)
 	double c = segDir.dot(segDir);
 	double d = lDir.dot(u);
 	double e = segDir.dot(u);
-	double det = a * c - b * b;
+	double det = a * c - b * d;
 	
 	double sDenom = det;
 	double tDenom = det;
@@ -61,7 +61,6 @@ double Line3d::distance(SegmentLine3d& segm)
 		sNum = 0.0;
 		tNum = e;
 		tDenom = c;
-		sDenom = a;
 	} 
 	else
 	{

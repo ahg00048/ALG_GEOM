@@ -154,3 +154,20 @@ void TriangleModel::writeBinaryFile(const std::string& path) {
 
 	fout.close();
 }
+
+std::vector<Triangle3d> TriangleModel::rayTraversal(RayLine3d& r)
+{
+	std::vector<Triangle3d> triangles = getFaces();
+	std::vector<Triangle3d> result(triangles.capacity());
+
+	Vect3d vecAux;
+
+	for (const Triangle3d& tri : triangles)
+	{
+		if (tri.rayTri(r, vecAux))
+			result.push_back(tri);
+	}
+
+	result.shrink_to_fit();
+	return result;
+}

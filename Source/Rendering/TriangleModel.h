@@ -55,4 +55,6 @@ public:
     std::vector<Vect2d>* getTextureCoordinates() { return &_textCoordinates; }
     std::vector<unsigned>* getIndices() { return &_indices; }
     size_t numTriangles();
+
+    std::vector<Triangle3d> rayTraversal(RayLine3d& r);
 };

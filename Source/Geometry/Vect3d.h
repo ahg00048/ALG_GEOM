@@ -163,12 +163,12 @@ public:
 	/**
 	*	@brief Vector subtraction.
 	*/
-	Vect3d sub(Vect3d& b) const;
+	Vect3d sub(const Vect3d& b) const;
 
 	/**
 	*	@brief Vectorial product.
 	*/
-	Vect3d xProduct(Vect3d& b) const;
+	Vect3d xProduct(const Vect3d& b) const;
 
 	Vect3d normalize();
 

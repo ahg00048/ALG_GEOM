@@ -25,6 +25,8 @@
 #pragma once
 
 #include "Vect3d.h"
+#include "RayLine3d.h"
+#include "AABB.h"
 
  /**
  *	@brief This class represents a triangle defined by 3 points.
@@ -58,6 +60,9 @@ public:
 
 protected:
 	Vect3d _a, _b, _c;
+
+private:
+	bool planeBoxOverlap(Vect3d normal, Vect3d vert, Vect3d maxbox) const;	// -NJMP-
 
 public:
 	/**
@@ -94,6 +99,10 @@ public:
 	*	@brief Returns the position of the point respect to the triangle plane.
 	*/
 	PointPosition classify(Vect3d& point);
+
+	bool rayTri(RayLine3d& r, Vect3d& v) const;
+
+	bool triAABB(AABB& aabb) const;
 
 	/**
 	*	@brief Returns a new triangle with the same values than this one.

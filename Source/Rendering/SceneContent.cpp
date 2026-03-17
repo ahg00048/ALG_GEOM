@@ -744,6 +744,20 @@ void AlgGeom::SceneContent::pr2D()
     delete s3;
 }
 
+void AlgGeom::SceneContent::pr3()
+{
+    // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado.
+    
+    // 3 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación.
+    
+    // 3 - Crear una nube de al menos 100 puntos dibujando de forma diferente los que están dentro de los que están fuera usando el nuevo método.
+    
+    // 4 - Hacer la misma operación sin usar la clasificación de nodos del Octree, es decir, lanzando dos/tres rayos contra todos los triángulos. 
+    //     Comprobar que los resultados son idénticos y medir los tiempos asociados.
+    
+
+}
+
 Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)
 {
     vec3 vect = RandomUtilities::getUniformRandomInUnitDisk();

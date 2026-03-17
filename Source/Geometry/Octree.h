@@ -58,7 +58,7 @@ public:
 	};
 
 private:
-	std::vector<Triangle3d*> _triangles;
+	std::vector<Triangle3d> _triangles;
 	Node _root;
 	bool _optimized;
 	TriangleModel* _model;
@@ -75,9 +75,11 @@ public:
 	void clear();
 
 	bool isOptimized() const { return _optimized; }
+
+	void setOptimized(bool opt) { _optimized = opt; }
 	
 	void insertTriangle(Triangle3d& tri) { _root.insertTriangle(&tri); }
-	bool isInside(const Vect3d& v);
+	bool isInsideModel(const Vect3d& v);
 	void classifyColor();
 
 	std::vector<Node*> getLeafNodes();

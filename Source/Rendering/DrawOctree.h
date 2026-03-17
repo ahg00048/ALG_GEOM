@@ -9,7 +9,7 @@ namespace AlgGeom
 	{
 	public:
 		DrawOctree() = delete;
-		DrawOctree(const Octree& oct);
+		DrawOctree(Octree& oct);
 		~DrawOctree() override {};
 	};
 };

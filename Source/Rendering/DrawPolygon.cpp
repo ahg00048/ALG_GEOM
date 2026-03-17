@@ -8,8 +8,8 @@ AlgGeom::DrawPolygon::DrawPolygon (Polygon &polygon): Model3D()
     size_t numVertices = polygon.getNumVertices();
     Component* component = new Component;
 
-    for (unsigned vertexIdx = 0; vertexIdx < polygon.getNumVertices(); vertexIdx++) {
-
+    for (unsigned vertexIdx = 0; vertexIdx < polygon.getNumVertices(); vertexIdx++) 
+    {
         Point point = polygon.getVertexAt(vertexIdx).getPoint();
 
         component->_vertices.push_back(VAO::Vertex{ vec3(point.getX(), point.getY(), .0f) });

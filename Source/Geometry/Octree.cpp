@@ -54,14 +54,14 @@ bool Octree::Node::hasChildren()
 
 void Octree::Node::insertTriangle(Triangle3d* tri)
 {
-	if (_level == Octree::MAX_LEVELS || _triangles.size() < Octree::MAX_TRI_NODE) // Mirar condicion de parada
+	if (_level == Octree::MAX_LEVELS) // Mirar condicion de parada
 	{
 		_triangles.push_back(tri);
 	
-		if (_triangles.size() > Octree::MAX_TRI_NODE)
-			_oct->_optimized = false;
+		if (_oct->isOptimized() && _triangles.size() > Octree::MAX_TRI_NODE)
+			_oct->setOptimized(false);
 	}
-	else
+	else if(_triangles.size() == Octree::MAX_TRI_NODE)
 	{
 		if (!hasChildren())
 		{
@@ -71,12 +71,26 @@ void Octree::Node::insertTriangle(Triangle3d* tri)
 		for (Node* n : _children)
 		{
 			AABB aabb = n->getAABB();
-			
+
+			for (Triangle3d* nTri : _triangles)
+			{
+				if (nTri->triAABB(aabb))
+				{
+					n->insertTriangle(nTri);
+				}
+			}
+
 			if (tri->triAABB(aabb))
 			{
 				n->insertTriangle(tri);
 			}
 		}
+
+		_triangles.clear();
+	}
+	else
+	{
+		_triangles.push_back(tri);
 	}
 }
 
@@ -144,14 +158,14 @@ Octree::Octree(TriangleModel& model, const std::string& objPath) :
 	_optimized(false), _model(&model)
 {
 	_model->loadModelBinaryFile(objPath);
-	std::vector<Triangle3d> triangles = _model->getFaces();
+	_triangles = _model->getFaces();
 
-	Vect3d min = (*triangles.begin()).getA();
-	Vect3d max = (*triangles.begin()).getA();
+	Vect3d min = (*_triangles.begin()).getA();
+	Vect3d max = (*_triangles.begin()).getA();
 
-	for (Triangle3d* tri : _triangles)
+	for (Triangle3d& tri : _triangles)
 	{
-		AABB triAABB = tri->getAABB();
+		AABB triAABB = tri.getAABB();
 
 		Vect3d aabbMin = triAABB.getMin();
 		Vect3d aabbMax = triAABB.getMax();
@@ -175,9 +189,9 @@ Octree::Octree(TriangleModel& model, const std::string& objPath) :
 	
 	_root = Octree::Node(0, min, max, this);
 
-	for (Triangle3d* tri : _triangles)
+	for (Triangle3d& tri : _triangles)
 	{
-		_root.insertTriangle(tri);
+		_root.insertTriangle(&tri);
 	}
 }
 
@@ -243,7 +257,7 @@ void Octree::clear()
 	}
 }
 
-bool Octree::isInside(const Vect3d& v)
+bool Octree::isInsideModel(const Vect3d& v)
 {
 	bool isInside = true;
 	Node* curr = &_root;
@@ -283,18 +297,56 @@ bool Octree::isInside(const Vect3d& v)
 
 	if (curr->getType() == Node::TypeColorNode::BLACK)
 	{
-		isInside = true;
+		return true;
 	}
 	else if (curr->getType() == Node::TypeColorNode::WHITE)
 	{
-		isInside = false;
+		return false;
 	}
 	else
 	{
-		//...
-	}
+		AABB aabb = curr->getAABB();
+		Vect3d dest1(RandomUtilities::getUniformRandom(aabb.getMin().getX(), aabb.getMax().getX()),
+					RandomUtilities::getUniformRandom(aabb.getMin().getY(), aabb.getMax().getY()),
+					RandomUtilities::getUniformRandom(aabb.getMin().getZ(), aabb.getMax().getZ()));
+		Vect3d dest2(RandomUtilities::getUniformRandom(aabb.getMin().getX(), aabb.getMax().getX()),
+					RandomUtilities::getUniformRandom(aabb.getMin().getY(), aabb.getMax().getY()),
+					RandomUtilities::getUniformRandom(aabb.getMin().getZ(), aabb.getMax().getZ()));
+		
+		Vect3d vAux = v;
 
-	return isInside;
+		RayLine3d r1(vAux, dest1);
+		RayLine3d r2(vAux, dest2);
+
+		unsigned int r1NInter = _model->rayTraversal(r1).size();
+		unsigned int r2NInter = _model->rayTraversal(r2).size();
+		
+		if (r1NInter % 2 == 0 && r2NInter % 2 == 0) // Par
+		{
+			return true;
+		}
+		else if (r1NInter % 2 != 0 && r2NInter % 2 != 0) // Impar
+		{
+			return false;
+		}
+
+		Vect3d dest3(RandomUtilities::getUniformRandom(aabb.getMin().getX(), aabb.getMax().getX()),
+			RandomUtilities::getUniformRandom(aabb.getMin().getY(), aabb.getMax().getY()),
+			RandomUtilities::getUniformRandom(aabb.getMin().getZ(), aabb.getMax().getZ()));
+
+		RayLine3d r3(vAux, dest3);
+
+		r1NInter = _model->rayTraversal(r3).size();
+
+		if (r1NInter % 2 == 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 }
 
 std::vector<Octree::Node*> Octree::getLeafNodes()

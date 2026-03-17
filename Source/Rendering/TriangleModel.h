@@ -37,15 +37,16 @@ protected:
     Assimp::Importer        _assimpImporter;
 
 protected:
-    void loadModelBinaryFile(const std::string& path);
     void processMesh(aiMesh* mesh, const aiScene* scene, const std::string& folder);
     void processNode(aiNode* node, const aiScene* scene, const std::string& folder);
-    void writeBinaryFile(const std::string& path);
 
 public:
     TriangleModel(const std::string& pathfile);
     TriangleModel(const TriangleModel& orig) = delete;
     virtual ~TriangleModel();
+
+    void loadModelBinaryFile(const std::string& path);
+    void writeBinaryFile(const std::string& path);
 
     PointCloud3d getCloud();
     Triangle3d getFace(unsigned index);
@@ -57,4 +58,5 @@ public:
     size_t numTriangles();
 
     std::vector<Triangle3d> rayTraversal(RayLine3d& r);
+    bool pointIntoMesh(Vect3d& v);
 };

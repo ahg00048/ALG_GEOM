@@ -249,6 +249,31 @@ bool Triangle3d::triAABB(AABB& aabb) const
 	return true;   /* box and triangle overlaps */
 }
 
+AABB Triangle3d::getAABB() const
+{
+	double xMin = ((_a.getX() < _b.getX()) ?
+		((_a.getX() < _c.getX()) ? _a.getX() : _c.getX()) :
+		((_b.getX() < _c.getX()) ? _b.getX() : _c.getX()));
+	double yMin = ((_a.getY() < _b.getY()) ?
+		((_a.getY() < _c.getY()) ? _a.getY() : _c.getY()) :
+		((_b.getY() < _c.getY()) ? _b.getY() : _c.getY()));
+	double zMin = ((_a.getZ() < _b.getZ()) ?
+		((_a.getZ() < _c.getZ()) ? _a.getZ() : _c.getZ()) :
+		((_b.getZ() < _c.getZ()) ? _b.getZ() : _c.getZ()));
+
+	double xMax = ((_a.getX() > _b.getX()) ?
+		((_a.getX() > _c.getX()) ? _a.getX() : _c.getX()) :
+		((_b.getX() > _c.getX()) ? _b.getX() : _c.getX()));
+	double yMax = ((_a.getY() > _b.getY()) ?
+		((_a.getY() > _c.getY()) ? _a.getY() : _c.getY()) :
+		((_b.getY() > _c.getY()) ? _b.getY() : _c.getY()));
+	double zMax = ((_a.getZ() > _b.getZ()) ?
+		((_a.getZ() > _c.getZ()) ? _a.getZ() : _c.getZ()) :
+		((_b.getZ() > _c.getZ()) ? _b.getZ() : _c.getZ()));
+
+	return AABB(Vect3d(xMin, yMin, zMin), Vect3d(xMax, yMax, zMax));
+}
+
 Vect3d Triangle3d::normal()
 {
 	Vect3d v1(_b.sub(_a));

@@ -104,6 +104,8 @@ public:
 
 	bool triAABB(AABB& aabb) const;
 
+	AABB getAABB() const;
+
 	/**
 	*	@brief Returns a new triangle with the same values than this one.
 	*/

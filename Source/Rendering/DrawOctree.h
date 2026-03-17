@@ -1,5 +1,15 @@
 #pragma once
-class DrawOctree
-{
-};
 
+#include "Model3D.h"
+#include "Octree.h"
+
+namespace AlgGeom
+{
+	class DrawOctree : public Model3D
+	{
+	public:
+		DrawOctree() = delete;
+		DrawOctree(const Octree& oct);
+		~DrawOctree() override {};
+	};
+};

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "DrawOctree.h"
 
-AlgGeom::DrawOctree::DrawOctree(Octree& oct)
+AlgGeom::DrawOctree::DrawOctree(Octree& oct) : Model3D()
 {
     Component* component = new Component;
 
@@ -54,7 +54,7 @@ AlgGeom::DrawOctree::DrawOctree(Octree& oct)
     this->buildVao(component);
 }
 
-AlgGeom::DrawOctree::DrawOctree(std::vector<Octree::Node*>& nodes)
+AlgGeom::DrawOctree::DrawOctree(std::vector<Octree::Node*>& nodes) : Model3D()
 {
     Component* component = new Component;
 

@@ -809,7 +809,17 @@ void AlgGeom::SceneContent::pr3()
 
     start = std::chrono::system_clock::now();
 
-    //...
+    for (Vect3d& point : pcPoints)
+    {
+        if (oct->isInsideModel(point))
+        {
+            pcS1Points.push_back(point);
+        }
+        else
+        {
+            pcS2Points.push_back(point);
+        }
+    }
 
     PointCloud3d* pcS1 = new PointCloud3d(pcS1Points);
     PointCloud3d* pcS2 = new PointCloud3d(pcS2Points);
@@ -834,8 +844,54 @@ void AlgGeom::SceneContent::pr3()
 
     //...
 
-    pcS1 = new PointCloud3d();
-    pcS2 = new PointCloud3d();
+    for (Vect3d& point : pcPoints)
+    {
+        float range = 1000.0f;
+
+        Vect3d dest1(RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range));
+        Vect3d dest2(RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range));
+
+        RayLine3d r1(point, dest1);
+        RayLine3d r2(point, dest2);
+
+        unsigned int r1NInter = tModel->rayTraversal(r1).size();
+        unsigned int r2NInter = tModel->rayTraversal(r2).size();
+
+        if (r1NInter % 2 == 0 && r2NInter % 2 == 0) // Par
+        {
+            pcS1Points.push_back(point);
+            continue;
+        }
+        else if (r1NInter % 2 != 0 && r2NInter % 2 != 0) // Impar
+        {
+            pcS2Points.push_back(point);
+            continue;
+        }
+
+        Vect3d dest3(RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range));
+
+        RayLine3d r3(point, dest3);
+
+        r1NInter = tModel->rayTraversal(r3).size();
+
+        if (r1NInter % 2 == 0)
+        {
+            pcS1Points.push_back(point);
+        }
+        else
+        {
+            pcS2Points.push_back(point);
+        }
+    }
+
+    pcS1 = new PointCloud3d(pcS1Points);
+    pcS2 = new PointCloud3d(pcS2Points);
 
     end = std::chrono::system_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();

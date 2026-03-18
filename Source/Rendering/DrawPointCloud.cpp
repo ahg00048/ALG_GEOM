@@ -37,3 +37,18 @@ AlgGeom::DrawPointCloud::DrawPointCloud(PointCloud3d& pointCloud) : Model3D()
     this->buildVao(component);
     this->calculateAABB();
 }
+
+AlgGeom::DrawPointCloud::DrawPointCloud(std::vector<Vect3d>& points) : Model3D()
+{
+    Component* component = new Component;
+
+    for (unsigned vertexIdx = 0; vertexIdx < points.size(); vertexIdx++) 
+    {
+        component->_vertices.push_back(VAO::Vertex{ points[vertexIdx] });
+        component->_indices[VAO::IBO_POINT].push_back(vertexIdx);
+    }
+
+    this->_components.push_back(std::unique_ptr<Component>(component));
+    this->buildVao(component);
+    this->calculateAABB();
+}

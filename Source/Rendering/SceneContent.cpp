@@ -745,20 +745,15 @@ void AlgGeom::SceneContent::pr2D()
 
 void AlgGeom::SceneContent::pr3()
 {
-    // testing ground -- lel 
-    
-    //test2();
-    //return;
-
     // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado. -- HECHO
-    const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/Ajax.obj";
+    const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/vaca.obj";
     TriangleModel* tModel = new TriangleModel(filePath);
     Octree* oct = new Octree(*tModel);
 
     addNewModel((new DrawMesh(*tModel))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
     addNewModel((new DrawOctree(*oct))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
 
-    // 2 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación.
+    // 2 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación. -- HECHO
     std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
     
     oct->classifyColor();
@@ -792,14 +787,15 @@ void AlgGeom::SceneContent::pr3()
         }
     }
 
-    addNewModel((new DrawOctree(grayNodes))->setLineColor(vec3(0.3f))->overrideModelName());
-    addNewModel((new DrawOctree(whiteNodes))->setLineColor(vec3(1.0f))->overrideModelName());
-    addNewModel((new DrawOctree(blackNodes))->setLineColor(vec3(0.0f))->overrideModelName());
+    float lineWidth = 3.0f;
+    addNewModel((new DrawOctree(grayNodes))->setLineColor(vec3(0.7f))->setLineWidth(lineWidth)->overrideModelName());
+    addNewModel((new DrawOctree(whiteNodes))->setLineColor(vec3(1.0f))->setLineWidth(lineWidth)->overrideModelName());
+    addNewModel((new DrawOctree(blackNodes))->setLineColor(vec3(0.0f))->setLineWidth(lineWidth)->overrideModelName());
 
-    // 3 - Crear una nube de al menos 100 puntos dibujando de forma diferente los que están dentro de los que están fuera usando el nuevo método.
+    // 3 - Crear una nube de al menos 100 puntos dibujando de forma diferente los que están dentro de los que están fuera usando el nuevo método. -- HECHO
     int pcSize = 100;
-    float pointPCSize = 3.0f;
-    PointCloud3d* pc = new PointCloud3d(pcSize, 2.0f);
+    float pointPCSize = 10.0f;
+    PointCloud3d* pc = new PointCloud3d(pcSize, 1.0f);
     std::vector<Vect3d> pcPoints = pc->getPoints();
     std::vector<Vect3d> pcS1Points;
     std::vector<Vect3d> pcS2Points;
@@ -838,11 +834,9 @@ void AlgGeom::SceneContent::pr3()
     delete pcS1;
     delete pcS2;
 
-    // 4 - Hacer la misma operación sin usar la clasificación de nodos del Octree, es decir, lanzando dos/tres rayos contra todos los triángulos. 
+    // 4 - Hacer la misma operación sin usar la clasificación de nodos del Octree, es decir, lanzando dos/tres rayos contra todos los triángulos. -- HECHO
     //     Comprobar que los resultados son idénticos y medir los tiempos asociados.
     start = std::chrono::system_clock::now();
-
-    //...
 
     for (Vect3d& point : pcPoints)
     {
@@ -863,12 +857,12 @@ void AlgGeom::SceneContent::pr3()
 
         if (r1NInter % 2 == 0 && r2NInter % 2 == 0) // Par
         {
-            pcS1Points.push_back(point);
+            pcS2Points.push_back(point);
             continue;
         }
         else if (r1NInter % 2 != 0 && r2NInter % 2 != 0) // Impar
         {
-            pcS2Points.push_back(point);
+            pcS1Points.push_back(point);
             continue;
         }
 
@@ -882,11 +876,11 @@ void AlgGeom::SceneContent::pr3()
 
         if (r1NInter % 2 == 0)
         {
-            pcS1Points.push_back(point);
+            pcS2Points.push_back(point);
         }
         else
         {
-            pcS2Points.push_back(point);
+            pcS1Points.push_back(point);
         }
     }
 
@@ -915,41 +909,4 @@ Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)
     vec3 vect = RandomUtilities::getUniformRandomInUnitDisk();
 
     return Point(vect.x * diskR, vect.y * diskR);
-}
-
-void AlgGeom::SceneContent::test1()
-{
-    Vect3d a(0.0f, -1.0f, -1.0f);
-    Vect3d b(0.0f, -1.0f, 1.0f);
-    Vect3d c(0.0f, 1.0f, 0.0f);
-    Triangle3d triangle(a, b, c);
-
-    Vect3d orig(-1.0f, 0.0f, 0.0f);
-    Vect3d dest(4.0f, 0.0f, 1.0f);
-    RayLine3d rayLine(orig, dest);
-
-    Vect3d interVect(0.0f, -1.0f, 0.0f);
-    std::cout << ((triangle.rayTri(rayLine, interVect)) ? "SI" : "NO") << std::endl;
-    std::cout << interVect << std::endl;
-
-    addNewModel((new DrawTriangle(triangle))->overrideModelName());
-    addNewModel((new DrawRay(rayLine))->setLineColor(vec3(0.0f, 0.0f, 1.0f))->setLineWidth(3.0f)->overrideModelName());
-    addNewModel((new DrawPoint(interVect))->setPointColor(vec3(1.0f, 0.0f, 0.0f))->setPointSize(5.0f)->overrideModelName());
-}
-
-void AlgGeom::SceneContent::test2()
-{
-    const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/Ajax.obj";
-    TriangleModel* tModel = new TriangleModel(filePath);
-
-    Vect3d orig(0.0f, 0.0f, 0.0f);
-    Vect3d dest(0.0f, 1.0f, 0.0f);
-    RayLine3d rayLine(orig, dest);
-
-    auto triVector = tModel->rayTraversal(rayLine);
-
-    addNewModel((new DrawMesh(*tModel))->setLineColor({ 0.0f, 1.0f, 1.0f })->overrideModelName()->moveGeometryToOrigin());
-    addNewModel((new DrawRay(rayLine))->setLineColor(vec3(0.0f, 0.0f, 1.0f))->setLineWidth(3.0f)->overrideModelName());
-
-    std::cout << "triVector size: " << triVector.size() << std::endl;
 }

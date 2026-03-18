@@ -31,10 +31,6 @@ namespace AlgGeom
 		void pr2D();
 		void pr3();
 
-		// Tests
-		void test1(); // rayTri
-		void test2(); //
-
 		Point randomPointInUnitDisk(float diskR);
 	};
 }

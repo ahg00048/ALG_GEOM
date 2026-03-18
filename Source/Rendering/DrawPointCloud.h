@@ -18,6 +18,7 @@ namespace AlgGeom
     public:
         DrawPointCloud(PointCloud& t);
         DrawPointCloud(PointCloud3d& t);
+        DrawPointCloud(std::vector<Vect3d>& points);
         DrawPointCloud(const DrawPointCloud& drawPointCloud) = delete;
         ~DrawPointCloud() override {};
     };

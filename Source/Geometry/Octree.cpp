@@ -72,7 +72,7 @@ bool Octree::Node::hasChildren()
 
 void Octree::Node::insertTriangle(Triangle3d* tri)
 {
-	if (_level == Octree::MAX_LEVELS) // Mirar condicion de parada
+	if (_level == Octree::MAX_LEVELS)
 	{
 		_triangles.push_back(tri);
 	
@@ -146,12 +146,12 @@ void Octree::Node::classifyColor(TriangleModel& model)
 
 	if (r1NInter % 2 == 0 && r2NInter % 2 == 0) // Par
 	{
-		_type = TypeColorNode::BLACK;
+		_type = TypeColorNode::WHITE;
 		return;
 	} 
 	else if (r1NInter % 2 != 0 && r2NInter % 2 != 0) // Impar
 	{
-		_type = TypeColorNode::WHITE;
+		_type = TypeColorNode::BLACK;
 		return;
 	} 	
 
@@ -165,11 +165,11 @@ void Octree::Node::classifyColor(TriangleModel& model)
 
 	if (r1NInter % 2 == 0)
 	{
-		_type = TypeColorNode::BLACK;
+		_type = TypeColorNode::WHITE;
 	} 
 	else
 	{
-		_type = TypeColorNode::WHITE;
+		_type = TypeColorNode::BLACK;
 	}
 }
 
@@ -333,11 +333,11 @@ bool Octree::isInsideModel(const Vect3d& v)
 		
 		if (r1NInter % 2 == 0 && r2NInter % 2 == 0) // Par
 		{
-			return true;
+			return false;
 		}
 		else if (r1NInter % 2 != 0 && r2NInter % 2 != 0) // Impar
 		{
-			return false;
+			return true;
 		}
 
 		Vect3d dest3(RandomUtilities::getUniformRandom(aabb.getMin().getX(), aabb.getMax().getX()),
@@ -350,11 +350,11 @@ bool Octree::isInsideModel(const Vect3d& v)
 
 		if (r1NInter % 2 == 0)
 		{
-			return true;
+			return false;
 		}
 		else
 		{
-			return false;
+			return true;
 		}
 	}
 }

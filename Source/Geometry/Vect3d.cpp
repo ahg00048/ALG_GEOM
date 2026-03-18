@@ -102,7 +102,7 @@ bool Vect3d::operator!=(const Vect3d& vector)
 
 std::ostream& operator<<(std::ostream& os, const Vect3d& vec)
 {
-	os << "Coordinate X: " << std::to_string(vec.X) << ", coordinate Y: " << std::to_string(vec.Y) << ", coordinate Z: " << std::to_string(vec.Z);
+	os << "Coordinate X: " << std::to_string(vec.getX()) << ", coordinate Y: " << std::to_string(vec.getY()) << ", coordinate Z: " << std::to_string(vec.getZ());
 	return os;
 }
 

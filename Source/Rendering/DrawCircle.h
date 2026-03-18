@@ -6,7 +6,7 @@
 
 namespace AlgGeom
 {
-	class DrawCircle: public Model3D
+	class DrawCircle : public Model3D
 	{
 	public:
 		DrawCircle(Circle& circle, uint32_t numSubdivisions = 256);

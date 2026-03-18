@@ -10,6 +10,7 @@ namespace AlgGeom
 	public:
 		DrawOctree() = delete;
 		DrawOctree(Octree& oct);
+		DrawOctree(std::vector<Octree::Node*>& nodes);
 		~DrawOctree() override {};
 	};
 };

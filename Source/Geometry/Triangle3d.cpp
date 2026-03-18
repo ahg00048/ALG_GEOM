@@ -111,13 +111,14 @@ bool Triangle3d::rayTri(RayLine3d& r, Vect3d& interVect) const
 {
 	Vect3d rOrig = r.getOrigin();
 	Vect3d rDir = r.getDestination().sub(rOrig);
+
 	Vect3d edge1 = _b.sub(_a);
 	Vect3d edge2 = _c.sub(_a);
 
 	// Backface culling, assuming CCW-wound triangles.
 	const Vect3d normal = edge1.xProduct(edge2); // No need to normalize
-	if (normal.dot(rDir) > 0)
-		return false;
+	//if (normal.dot(rDir) > 0)
+	//	return false;
 
 	Vect3d ray_cross_e2 = rDir.xProduct(edge2);
 	float det = edge1.dot(ray_cross_e2);

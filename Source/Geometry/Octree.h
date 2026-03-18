@@ -22,13 +22,15 @@ public:
 			GRAY
 		};
 
+		const static unsigned int N_CHILDREN = 8;
+	
 	private:
 		std::vector<Triangle3d*> _triangles;
 		Vect3d _min;
 		Vect3d _max;
 		int _level;
 		Octree* _oct;
-		std::array<Node*, 8> _children;
+		Node* _children;
 		TypeColorNode _type;
 
 	private:
@@ -37,10 +39,11 @@ public:
 	public:
 		Node();
 		Node(int level, Vect3d min, Vect3d max, Octree* oct);
+		~Node();
 
 		const Vect3d& getMin() const { return _min; }
 		const Vect3d& getMax() const { return _max; }
-		std::array<Node*, 8> getChildren() const{ return _children; }
+		Node* getChildren() const{ return _children; }
 		int getLevel() const { return _level; }
 		TypeColorNode getType() const { return _type; }
 		
@@ -55,6 +58,8 @@ public:
 		bool hasChildren();
 		void destroyChildren();
 		void classifyColor(TriangleModel& model);
+
+		bool operator==(const Node& other);
 	};
 
 private:
@@ -65,11 +70,11 @@ private:
 
 public:
 	static const unsigned int MAX_TRI_NODE = 40;
-	static const unsigned int MAX_LEVELS = 9;
+	static const unsigned int MAX_LEVELS = 8;
 
 public:
 	Octree();
-	Octree(TriangleModel& model, const std::string& objPath);
+	Octree(TriangleModel& model);
 	~Octree();
 
 	void clear();

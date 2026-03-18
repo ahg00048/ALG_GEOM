@@ -161,7 +161,7 @@ void TriangleModel::writeBinaryFile(const std::string& path) {
 std::vector<Triangle3d> TriangleModel::rayTraversal(RayLine3d& r)
 {
 	std::vector<Triangle3d> triangles = getFaces();
-	std::vector<Triangle3d> result(triangles.capacity());
+	std::vector<Triangle3d> result;
 
 	Vect3d vecAux;
 
@@ -171,11 +171,5 @@ std::vector<Triangle3d> TriangleModel::rayTraversal(RayLine3d& r)
 			result.push_back(tri);
 	}
 
-	result.shrink_to_fit();
 	return result;
-}
-
-bool TriangleModel::pointIntoMesh(Vect3d& v)
-{
-
 }

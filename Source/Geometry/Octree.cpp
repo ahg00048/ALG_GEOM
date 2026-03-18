@@ -4,24 +4,40 @@
 // Node
 
 Octree::Node::Node(int level, Vect3d min, Vect3d max, Octree* oct) :
-	_level(level), _min(min), _max(max), _oct(oct), _type(TypeColorNode::WHITE)
+	_level(level), _min(min), _max(max), _oct(oct), _type(TypeColorNode::WHITE), _children(nullptr)
 {
 
 }
 
 Octree::Node::Node() :
-	_level(-1), _min(), _max(), _oct(nullptr), _type(TypeColorNode::WHITE)
+	_level(-1), _min(), _max(), _oct(nullptr), _type(TypeColorNode::WHITE), _children(nullptr)
 {
 
 }
 
+Octree::Node::~Node()
+{
+	_oct = nullptr;
+
+	if (_children)
+	{
+		delete _children;
+		_children = nullptr;
+	}
+}
+
+bool Octree::Node::operator==(const Node& other)
+{
+	bool result = (_min == other._min) && (_max == other._max) && (_level == other._level);
+	
+	return result;
+}
+
 void Octree::Node::destroyChildren()
 {
-	for (Node* n : _children)
-	{
-		delete n;
-		n = nullptr;
-	}
+	delete[] _children;
+
+	_children = nullptr;
 }
 
 void Octree::Node::createChildren()
@@ -37,19 +53,21 @@ void Octree::Node::createChildren()
 	double medY = (maxY + minY) / 2;
 	double medZ = (maxZ + minZ) / 2;
 
-	_children[6] = new Node(_level + 1, Vect3d(minX, medY, medZ), Vect3d(medX, maxY, maxZ), _oct);
-	_children[4] = new Node(_level + 1, Vect3d(minX, medY, minZ), Vect3d(medX, maxY, medZ), _oct);
-	_children[5] = new Node(_level + 1, Vect3d(medX, medY, minZ), Vect3d(maxX, maxY, medZ), _oct);
-	_children[7] = new Node(_level + 1, Vect3d(medX, medY, medZ), Vect3d(maxX, maxY, maxZ), _oct);
-	_children[2] = new Node(_level + 1, Vect3d(minX, minY, medZ), Vect3d(medX, medY, maxZ), _oct);
-	_children[0] = new Node(_level + 1, Vect3d(minX, minY, minZ), Vect3d(medX, medY, medZ), _oct);
-	_children[1] = new Node(_level + 1, Vect3d(medX, minY, minZ), Vect3d(maxX, medY, medZ), _oct);
-	_children[3] = new Node(_level + 1, Vect3d(medX, minY, medZ), Vect3d(maxX, medY, maxZ), _oct);
+	_children = new Node[Node::N_CHILDREN];
+
+	_children[6] = Node(_level + 1, Vect3d(minX, medY, medZ), Vect3d(medX, maxY, maxZ), _oct);
+	_children[4] = Node(_level + 1, Vect3d(minX, medY, minZ), Vect3d(medX, maxY, medZ), _oct);
+	_children[5] = Node(_level + 1, Vect3d(medX, medY, minZ), Vect3d(maxX, maxY, medZ), _oct);
+	_children[7] = Node(_level + 1, Vect3d(medX, medY, medZ), Vect3d(maxX, maxY, maxZ), _oct);
+	_children[2] = Node(_level + 1, Vect3d(minX, minY, medZ), Vect3d(medX, medY, maxZ), _oct);
+	_children[0] = Node(_level + 1, Vect3d(minX, minY, minZ), Vect3d(medX, medY, medZ), _oct);
+	_children[1] = Node(_level + 1, Vect3d(medX, minY, minZ), Vect3d(maxX, medY, medZ), _oct);
+	_children[3] = Node(_level + 1, Vect3d(medX, minY, medZ), Vect3d(maxX, medY, maxZ), _oct);
 }
 
 bool Octree::Node::hasChildren() 
 {
-	return _children[0];
+	return _children;
 }
 
 void Octree::Node::insertTriangle(Triangle3d* tri)
@@ -61,28 +79,37 @@ void Octree::Node::insertTriangle(Triangle3d* tri)
 		if (_oct->isOptimized() && _triangles.size() > Octree::MAX_TRI_NODE)
 			_oct->setOptimized(false);
 	}
-	else if(_triangles.size() == Octree::MAX_TRI_NODE)
+	else if (hasChildren()) 
 	{
-		if (!hasChildren())
+		for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
 		{
-			createChildren();
-		}
+			AABB aabb = _children[i].getAABB();
 
-		for (Node* n : _children)
+			if (tri->triAABB(aabb))
+			{
+				_children[i].insertTriangle(tri);
+			}
+		}
+	}
+	else if (_triangles.size() == Octree::MAX_TRI_NODE)
+	{
+		createChildren();
+	
+		for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
 		{
-			AABB aabb = n->getAABB();
+			AABB aabb = _children[i].getAABB();
 
 			for (Triangle3d* nTri : _triangles)
 			{
 				if (nTri->triAABB(aabb))
 				{
-					n->insertTriangle(nTri);
+					_children[i].insertTriangle(nTri);
 				}
 			}
 
 			if (tri->triAABB(aabb))
 			{
-				n->insertTriangle(tri);
+				_children[i].insertTriangle(tri);
 			}
 		}
 
@@ -154,10 +181,9 @@ Octree::Octree() :
 
 }
 
-Octree::Octree(TriangleModel& model, const std::string& objPath) :
-	_optimized(false), _model(&model)
+Octree::Octree(TriangleModel& model) :
+	_optimized(false), _model(&model), _root()
 {
-	_model->loadModelBinaryFile(objPath);
 	_triangles = _model->getFaces();
 
 	Vect3d min = (*_triangles.begin()).getA();
@@ -203,27 +229,12 @@ Octree::~Octree()
 
 void Octree::classifyColor()
 {
-	std::stack<Octree::Node*> nodes;
-	std::vector<Octree::Node*> vNodes;
-	nodes.push(&_root);
+	std::vector<Octree::Node*> nodes = getLeafNodes();
 
-	while (!nodes.empty())
-	{
-		Node* curr = nodes.top();
-
-		while (curr->hasChildren() && std::find(vNodes.begin(), vNodes.end(), curr) != vNodes.end())
-		{
-			for (Node* n : curr->getChildren())
-			{
-				nodes.push(n);
-			}
-
-			vNodes.push_back(curr);
-			curr = nodes.top();
-		}
-
-		curr->classifyColor(*_model);
-		nodes.pop();
+	unsigned int i = 0;
+	for (Octree::Node* n : nodes)
+	{	
+		n->classifyColor(*_model);
 	}
 }
 
@@ -237,11 +248,12 @@ void Octree::clear()
 	{
 		Node* curr = nodes.top();
 	
-		while (curr->hasChildren() && std::find(vNodes.begin(), vNodes.end(), curr) != vNodes.end())
+		while (curr->hasChildren() && std::find(vNodes.begin(), vNodes.end(), curr) == vNodes.end())
 		{
-			for (Node* n : curr->getChildren())
+			Node* children = curr->getChildren();
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
 			{
-				nodes.push(n);
+				nodes.push(&children[i]);
 			}
 
 			vNodes.push_back(curr);
@@ -265,9 +277,6 @@ bool Octree::isInsideModel(const Vect3d& v)
 	Vect3d min = curr->getAABB().getMin();
 	Vect3d max = curr->getAABB().getMax();
 
-	Vect3d min = curr->getAABB().getMin();
-	Vect3d max = curr->getAABB().getMax();
-
 	if (!(v.getX() >= min.getX() && v.getX() <= max.getX() &&
 		v.getY() >= min.getY() && v.getY() <= max.getY() &&
 		v.getZ() >= min.getZ() && v.getZ() <= max.getZ()))
@@ -279,16 +288,17 @@ bool Octree::isInsideModel(const Vect3d& v)
 	{
 		isInside = false;
 
-		for (Node* n : curr->getChildren())
+		Node* children = curr->getChildren();
+		for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
 		{
-			min = curr->getAABB().getMin();
-			max = curr->getAABB().getMax();
+			min = children[i].getAABB().getMin();
+			max = children[i].getAABB().getMax();
 
 			if (v.getX() >= min.getX() && v.getX() <= max.getX() &&
 				v.getY() >= min.getY() && v.getY() <= max.getY() &&
 				v.getZ() >= min.getZ() && v.getZ() <= max.getZ())
 			{
-				curr = n;
+				curr = &children[i];
 				isInside = true;
 				break;
 			}
@@ -360,11 +370,12 @@ std::vector<Octree::Node*> Octree::getLeafNodes()
 	{
 		Node* curr = nodes.top();
 
-		while (curr->hasChildren() && std::find(vNodes.begin(), vNodes.end(), curr) != vNodes.end())
+		while (curr->hasChildren() && std::find(vNodes.begin(), vNodes.end(), curr) == vNodes.end())
 		{
-			for (Node* n : curr->getChildren())
+			Node* children = curr->getChildren();
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
 			{
-				nodes.push(n);
+				nodes.push(&children[i]);
 			}
 
 			vNodes.push_back(curr);

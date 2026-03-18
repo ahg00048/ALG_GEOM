@@ -14,8 +14,7 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    //pr2A_B_C();
-    pr2D();
+    pr3();
 }
 
 
@@ -746,16 +745,113 @@ void AlgGeom::SceneContent::pr2D()
 
 void AlgGeom::SceneContent::pr3()
 {
-    // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado.
+    // testing ground -- lel 
     
-    // 3 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación.
+    //test2();
+    //return;
+
+    // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado. -- HECHO
+    const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/Ajax.obj";
+    TriangleModel* tModel = new TriangleModel(filePath);
+    Octree* oct = new Octree(*tModel);
+
+    addNewModel((new DrawMesh(*tModel))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
+    addNewModel((new DrawOctree(*oct))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
+
+    // 2 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación.
+    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
     
+    oct->classifyColor();
+
+    std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+    double duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    constexpr const char* fmt = "\nEXERCISE {}: \n  Time of the operation: {} ms \n\n";
+    std::cout << std::format(fmt, 2, duration);
+
+    std::vector<Octree::Node*> leafNodes = oct->getLeafNodes();
+    std::vector<Octree::Node*> grayNodes;
+    std::vector<Octree::Node*> whiteNodes;
+    std::vector<Octree::Node*> blackNodes;
+
+    for (Octree::Node* n : leafNodes)
+    {
+        Octree::Node::TypeColorNode nType = n->getType();
+
+        switch (nType)
+        {
+        case Octree::Node::TypeColorNode::BLACK:
+            blackNodes.push_back(n);
+            break;
+        case Octree::Node::TypeColorNode::WHITE:
+            whiteNodes.push_back(n);
+            break;
+        case Octree::Node::TypeColorNode::GRAY:
+            grayNodes.push_back(n);
+            break;
+        }
+    }
+
+    addNewModel((new DrawOctree(grayNodes))->setLineColor(vec3(0.3f))->overrideModelName());
+    addNewModel((new DrawOctree(whiteNodes))->setLineColor(vec3(1.0f))->overrideModelName());
+    addNewModel((new DrawOctree(blackNodes))->setLineColor(vec3(0.0f))->overrideModelName());
+
     // 3 - Crear una nube de al menos 100 puntos dibujando de forma diferente los que están dentro de los que están fuera usando el nuevo método.
-    
+    int pcSize = 100;
+    float pointPCSize = 3.0f;
+    PointCloud3d* pc = new PointCloud3d(pcSize, 2.0f);
+    std::vector<Vect3d> pcPoints = pc->getPoints();
+    std::vector<Vect3d> pcS1Points;
+    std::vector<Vect3d> pcS2Points;
+
+    vec3 pcS1Color = { 1.0f, 0.0f ,0.0f };  // red
+    vec3 pcS2Color = { 0.0f, 1.0f ,0.0f };  // green
+
+    start = std::chrono::system_clock::now();
+
+    //...
+
+    PointCloud3d* pcS1 = new PointCloud3d(pcS1Points);
+    PointCloud3d* pcS2 = new PointCloud3d(pcS2Points);
+
+    pcS1Points.clear();
+    pcS2Points.clear();
+
+    end = std::chrono::system_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << std::format(fmt, 3, duration);
+
+    addNewModel((new DrawPointCloud(*pcS1))->setPointColor(pcS1Color)->setPointSize(pointPCSize)->overrideModelName());
+    addNewModel((new DrawPointCloud(*pcS2))->setPointColor(pcS2Color)->setPointSize(pointPCSize)->overrideModelName());
+
+    delete pcS1;
+    delete pcS2;
+
     // 4 - Hacer la misma operación sin usar la clasificación de nodos del Octree, es decir, lanzando dos/tres rayos contra todos los triángulos. 
     //     Comprobar que los resultados son idénticos y medir los tiempos asociados.
-    
+    start = std::chrono::system_clock::now();
 
+    //...
+
+    pcS1 = new PointCloud3d();
+    pcS2 = new PointCloud3d();
+
+    end = std::chrono::system_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << std::format(fmt, 4, duration) << std::endl;
+
+    addNewModel((new DrawPointCloud(*pcS1))->setPointColor(pcS1Color)->setPointSize(pointPCSize)->overrideModelName());
+    addNewModel((new DrawPointCloud(*pcS2))->setPointColor(pcS2Color)->setPointSize(pointPCSize)->overrideModelName());
+
+    delete pcS1;
+    delete pcS2;
+
+    // free resources
+    delete pc; 
+    delete oct;
+    delete tModel;
 }
 
 Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)
@@ -763,4 +859,41 @@ Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)
     vec3 vect = RandomUtilities::getUniformRandomInUnitDisk();
 
     return Point(vect.x * diskR, vect.y * diskR);
+}
+
+void AlgGeom::SceneContent::test1()
+{
+    Vect3d a(0.0f, -1.0f, -1.0f);
+    Vect3d b(0.0f, -1.0f, 1.0f);
+    Vect3d c(0.0f, 1.0f, 0.0f);
+    Triangle3d triangle(a, b, c);
+
+    Vect3d orig(-1.0f, 0.0f, 0.0f);
+    Vect3d dest(4.0f, 0.0f, 1.0f);
+    RayLine3d rayLine(orig, dest);
+
+    Vect3d interVect(0.0f, -1.0f, 0.0f);
+    std::cout << ((triangle.rayTri(rayLine, interVect)) ? "SI" : "NO") << std::endl;
+    std::cout << interVect << std::endl;
+
+    addNewModel((new DrawTriangle(triangle))->overrideModelName());
+    addNewModel((new DrawRay(rayLine))->setLineColor(vec3(0.0f, 0.0f, 1.0f))->setLineWidth(3.0f)->overrideModelName());
+    addNewModel((new DrawPoint(interVect))->setPointColor(vec3(1.0f, 0.0f, 0.0f))->setPointSize(5.0f)->overrideModelName());
+}
+
+void AlgGeom::SceneContent::test2()
+{
+    const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/Ajax.obj";
+    TriangleModel* tModel = new TriangleModel(filePath);
+
+    Vect3d orig(0.0f, 0.0f, 0.0f);
+    Vect3d dest(0.0f, 1.0f, 0.0f);
+    RayLine3d rayLine(orig, dest);
+
+    auto triVector = tModel->rayTraversal(rayLine);
+
+    addNewModel((new DrawMesh(*tModel))->setLineColor({ 0.0f, 1.0f, 1.0f })->overrideModelName()->moveGeometryToOrigin());
+    addNewModel((new DrawRay(rayLine))->setLineColor(vec3(0.0f, 0.0f, 1.0f))->setLineWidth(3.0f)->overrideModelName());
+
+    std::cout << "triVector size: " << triVector.size() << std::endl;
 }

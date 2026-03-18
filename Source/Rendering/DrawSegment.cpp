@@ -23,8 +23,8 @@ AlgGeom::DrawSegment::DrawSegment(SegmentLine3d& segment) : Model3D()
 {
     Component* component = new Component;
     component->_vertices.insert(component->_vertices.end(), {
-            VAO::Vertex { vec3(segment.getOrigin().getX(), segment.getOrigin().getY(), segment.getOrigin().getZ()) },
-            VAO::Vertex { vec3(segment.getDestination().getX(), segment.getDestination().getY(), segment.getDestination().getZ()) }
+            VAO::Vertex { segment.getOrigin() },
+            VAO::Vertex { segment.getDestination() }
         });
 
     component->_indices[VAO::IBO_LINE].insert(component->_indices[VAO::IBO_LINE].end(), { 0, 1 });

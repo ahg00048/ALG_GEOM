@@ -9,3 +9,4 @@
 #include "DrawPointCloud.h"
 #include "DrawPoint.h"
 #include "DrawMesh.h"
+#include "DrawOctree.h"

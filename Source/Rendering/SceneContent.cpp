@@ -14,8 +14,7 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    //pr2A_B_C();
-    pr2D();
+    pr3();
 }
 
 
@@ -742,6 +741,167 @@ void AlgGeom::SceneContent::pr2D()
     delete s1;
     delete s2;
     delete s3;
+}
+
+void AlgGeom::SceneContent::pr3()
+{
+    // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado. -- HECHO
+    const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/vaca.obj";
+    TriangleModel* tModel = new TriangleModel(filePath);
+    Octree* oct = new Octree(*tModel);
+
+    addNewModel((new DrawMesh(*tModel))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
+    addNewModel((new DrawOctree(*oct))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
+
+    // 2 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación. -- HECHO
+    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+    
+    oct->classifyColor();
+
+    std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+    double duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    constexpr const char* fmt = "\nEXERCISE {}: \n  Time of the operation: {} ms \n\n";
+    std::cout << std::format(fmt, 2, duration);
+
+    std::vector<Octree::Node*> leafNodes = oct->getLeafNodes();
+    std::vector<Octree::Node*> grayNodes;
+    std::vector<Octree::Node*> whiteNodes;
+    std::vector<Octree::Node*> blackNodes;
+
+    for (Octree::Node* n : leafNodes)
+    {
+        Octree::Node::TypeColorNode nType = n->getType();
+
+        switch (nType)
+        {
+        case Octree::Node::TypeColorNode::BLACK:
+            blackNodes.push_back(n);
+            break;
+        case Octree::Node::TypeColorNode::WHITE:
+            whiteNodes.push_back(n);
+            break;
+        case Octree::Node::TypeColorNode::GRAY:
+            grayNodes.push_back(n);
+            break;
+        }
+    }
+
+    float lineWidth = 3.0f;
+    addNewModel((new DrawOctree(grayNodes))->setLineColor(vec3(0.7f))->setLineWidth(lineWidth)->overrideModelName());
+    addNewModel((new DrawOctree(whiteNodes))->setLineColor(vec3(1.0f))->setLineWidth(lineWidth)->overrideModelName());
+    addNewModel((new DrawOctree(blackNodes))->setLineColor(vec3(0.0f))->setLineWidth(lineWidth)->overrideModelName());
+
+    // 3 - Crear una nube de al menos 100 puntos dibujando de forma diferente los que están dentro de los que están fuera usando el nuevo método. -- HECHO
+    int pcSize = 100;
+    float pointPCSize = 10.0f;
+    PointCloud3d* pc = new PointCloud3d(pcSize, 1.0f);
+    std::vector<Vect3d> pcPoints = pc->getPoints();
+    std::vector<Vect3d> pcS1Points;
+    std::vector<Vect3d> pcS2Points;
+
+    vec3 pcS1Color = { 1.0f, 0.0f ,0.0f };  // red
+    vec3 pcS2Color = { 0.0f, 1.0f ,0.0f };  // green
+
+    start = std::chrono::system_clock::now();
+
+    for (Vect3d& point : pcPoints)
+    {
+        if (oct->isInsideModel(point))
+        {
+            pcS1Points.push_back(point);
+        }
+        else
+        {
+            pcS2Points.push_back(point);
+        }
+    }
+
+    PointCloud3d* pcS1 = new PointCloud3d(pcS1Points);
+    PointCloud3d* pcS2 = new PointCloud3d(pcS2Points);
+
+    pcS1Points.clear();
+    pcS2Points.clear();
+
+    end = std::chrono::system_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << std::format(fmt, 3, duration);
+
+    addNewModel((new DrawPointCloud(*pcS1))->setPointColor(pcS1Color)->setPointSize(pointPCSize)->overrideModelName());
+    addNewModel((new DrawPointCloud(*pcS2))->setPointColor(pcS2Color)->setPointSize(pointPCSize)->overrideModelName());
+
+    delete pcS1;
+    delete pcS2;
+
+    // 4 - Hacer la misma operación sin usar la clasificación de nodos del Octree, es decir, lanzando dos/tres rayos contra todos los triángulos. -- HECHO
+    //     Comprobar que los resultados son idénticos y medir los tiempos asociados.
+    start = std::chrono::system_clock::now();
+
+    for (Vect3d& point : pcPoints)
+    {
+        float range = 1000.0f;
+
+        Vect3d dest1(RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range));
+        Vect3d dest2(RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range));
+
+        RayLine3d r1(point, dest1);
+        RayLine3d r2(point, dest2);
+
+        unsigned int r1NInter = tModel->rayTraversal(r1).size();
+        unsigned int r2NInter = tModel->rayTraversal(r2).size();
+
+        if (r1NInter % 2 == 0 && r2NInter % 2 == 0) // Par
+        {
+            pcS2Points.push_back(point);
+            continue;
+        }
+        else if (r1NInter % 2 != 0 && r2NInter % 2 != 0) // Impar
+        {
+            pcS1Points.push_back(point);
+            continue;
+        }
+
+        Vect3d dest3(RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range),
+            RandomUtilities::getUniformRandom(-range, range));
+
+        RayLine3d r3(point, dest3);
+
+        r1NInter = tModel->rayTraversal(r3).size();
+
+        if (r1NInter % 2 == 0)
+        {
+            pcS2Points.push_back(point);
+        }
+        else
+        {
+            pcS1Points.push_back(point);
+        }
+    }
+
+    pcS1 = new PointCloud3d(pcS1Points);
+    pcS2 = new PointCloud3d(pcS2Points);
+
+    end = std::chrono::system_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << std::format(fmt, 4, duration) << std::endl;
+
+    addNewModel((new DrawPointCloud(*pcS1))->setPointColor(pcS1Color)->setPointSize(pointPCSize)->overrideModelName());
+    addNewModel((new DrawPointCloud(*pcS2))->setPointColor(pcS2Color)->setPointSize(pointPCSize)->overrideModelName());
+
+    delete pcS1;
+    delete pcS2;
+
+    // free resources
+    delete pc; 
+    delete oct;
+    delete tModel;
 }
 
 Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)

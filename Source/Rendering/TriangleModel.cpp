@@ -6,15 +6,18 @@ TriangleModel::TriangleModel(const std::string& pathfile)
 {
 	std::string binaryFile = pathfile.substr(0, pathfile.find_last_of('.')) + "TriMod" + BINARY_EXTENSION;
 
-	if (std::filesystem::exists(binaryFile)) {
+	if (std::filesystem::exists(binaryFile)) 
+	{
 		this->loadModelBinaryFile(binaryFile);
 	}
-	else {
+	else 
+	{
 		const aiScene* scene = _assimpImporter.ReadFile(pathfile,
 			aiProcess_JoinIdenticalVertices | aiProcess_Triangulate |
 			aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 		
-		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) 
+		{
 			std::cout << "ERROR::ASSIMP::" << _assimpImporter.GetErrorString() << std::endl;
 			return;
 		}
@@ -153,4 +156,20 @@ void TriangleModel::writeBinaryFile(const std::string& path) {
 		fout.write((char*)this->_indices.data(), numIndices * sizeof(GLuint));
 
 	fout.close();
+}
+
+std::vector<Triangle3d> TriangleModel::rayTraversal(RayLine3d& r)
+{
+	std::vector<Triangle3d> triangles = getFaces();
+	std::vector<Triangle3d> result;
+
+	Vect3d vecAux;
+
+	for (const Triangle3d& tri : triangles)
+	{
+		if (tri.rayTri(r, vecAux))
+			result.push_back(tri);
+	}
+
+	return result;
 }

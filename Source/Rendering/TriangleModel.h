@@ -37,9 +37,10 @@ protected:
     Assimp::Importer        _assimpImporter;
 
 protected:
-    void loadModelBinaryFile(const std::string& path);
     void processMesh(aiMesh* mesh, const aiScene* scene, const std::string& folder);
     void processNode(aiNode* node, const aiScene* scene, const std::string& folder);
+
+    void loadModelBinaryFile(const std::string& path);
     void writeBinaryFile(const std::string& path);
 
 public:
@@ -55,4 +56,6 @@ public:
     std::vector<Vect2d>* getTextureCoordinates() { return &_textCoordinates; }
     std::vector<unsigned>* getIndices() { return &_indices; }
     size_t numTriangles();
+
+    std::vector<Triangle3d> rayTraversal(RayLine3d& r);
 };

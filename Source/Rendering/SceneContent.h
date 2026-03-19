@@ -29,6 +29,7 @@ namespace AlgGeom
 		void pr1B();
 		void pr2A_B_C();
 		void pr2D();
+		void pr3();
 
 		Point randomPointInUnitDisk(float diskR);
 	};

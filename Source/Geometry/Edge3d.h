@@ -56,12 +56,12 @@ public:
 	/**
 	*	@brief Returns the destination point.
 	*/
-	Vect3d getDestination();
+	const Vect3d& getDestination();
 
 	/**
 	*	@brief Returns the initial point.
 	*/
-	Vect3d getOrigin();
+	const Vect3d& getOrigin();
 
 	void setOrigin(const Vect3d& orig);
 	

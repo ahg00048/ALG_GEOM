@@ -102,7 +102,7 @@ bool Vect3d::operator!=(const Vect3d& vector)
 
 std::ostream& operator<<(std::ostream& os, const Vect3d& vec)
 {
-	os << "Coordinate X: " << std::to_string(vec.X) << ", coordinate Y: " << std::to_string(vec.Y) << ", coordinate Z: " << std::to_string(vec.Z);
+	os << "Coordinate X: " << std::to_string(vec.getX()) << ", coordinate Y: " << std::to_string(vec.getY()) << ", coordinate Z: " << std::to_string(vec.getZ());
 	return os;
 }
 
@@ -133,12 +133,12 @@ void Vect3d::setVert(double x, double y, double z)
 	_value[Z] = z;
 }
 
-Vect3d Vect3d::sub(Vect3d& b) const
+Vect3d Vect3d::sub(const Vect3d& b) const
 {
 	return Vect3d(getX() - b.getX(), getY() - b.getY(), getZ() - b.getZ());
 }
 
-Vect3d Vect3d::xProduct(Vect3d& b) const
+Vect3d Vect3d::xProduct(const Vect3d& b) const
 {
 	return Vect3d(getY() * b.getZ() - getZ() * b.getY(), getZ() * b.getX() - getX() * b.getZ(), getX() * b.getY() - getY() * b.getX());
 }

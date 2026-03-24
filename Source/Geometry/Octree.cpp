@@ -113,7 +113,7 @@ void Octree::Node::insertTriangle(Triangle3d* tri)
 			}
 		}
 
-		_triangles.clear();
+		_triangles = std::vector<Triangle3d*>();
 	}
 	else
 	{
@@ -131,13 +131,9 @@ void Octree::Node::classifyColor(TriangleModel& model)
 
 	AABB aabb(_min, _max);
 	Vect3d center = aabb.getCenter();
-	Vect3d dest1(RandomUtilities::getUniformRandom(_min.getX(), _max.getX()),
-		RandomUtilities::getUniformRandom(_min.getY(), _max.getY()),
-		RandomUtilities::getUniformRandom(_min.getZ(), _max.getZ()));
-	Vect3d dest2(RandomUtilities::getUniformRandom(_min.getX(), _max.getX()),
-		RandomUtilities::getUniformRandom(_min.getY(), _max.getY()),
-		RandomUtilities::getUniformRandom(_min.getZ(), _max.getZ()));
-
+	Vect3d dest1 = Vect3d(1.0f, 0.0f, 0.0f).add(center);
+	Vect3d dest2 = Vect3d(0.0f, 1.0f, 0.0f).add(center);
+	
 	RayLine3d r1(center, dest1);
 	RayLine3d r2(center, dest2);
 
@@ -155,9 +151,7 @@ void Octree::Node::classifyColor(TriangleModel& model)
 		return;
 	} 	
 
-	Vect3d dest3(RandomUtilities::getUniformRandom(_min.getX(), _max.getX()),
-		RandomUtilities::getUniformRandom(_min.getY(), _max.getY()),
-		RandomUtilities::getUniformRandom(_min.getZ(), _max.getZ()));
+	Vect3d dest3 = Vect3d(0.0f, 0.0f, 1.0f).add(center);
 	
 	RayLine3d r3(center, dest3);
 	
@@ -271,8 +265,8 @@ void Octree::clear()
 
 bool Octree::isInsideModel(const Vect3d& v)
 {
-	bool isInside = true;
 	Node* curr = &_root;
+	bool isInside = true;
 
 	Vect3d min = curr->getAABB().getMin();
 	Vect3d max = curr->getAABB().getMax();
@@ -316,14 +310,11 @@ bool Octree::isInsideModel(const Vect3d& v)
 	else
 	{
 		AABB aabb = curr->getAABB();
-		Vect3d dest1(RandomUtilities::getUniformRandom(aabb.getMin().getX(), aabb.getMax().getX()),
-					RandomUtilities::getUniformRandom(aabb.getMin().getY(), aabb.getMax().getY()),
-					RandomUtilities::getUniformRandom(aabb.getMin().getZ(), aabb.getMax().getZ()));
-		Vect3d dest2(RandomUtilities::getUniformRandom(aabb.getMin().getX(), aabb.getMax().getX()),
-					RandomUtilities::getUniformRandom(aabb.getMin().getY(), aabb.getMax().getY()),
-					RandomUtilities::getUniformRandom(aabb.getMin().getZ(), aabb.getMax().getZ()));
 		
 		Vect3d vAux = v;
+		
+		Vect3d dest1 = Vect3d(1.0f, 0.0f, 0.0f).add(vAux);
+		Vect3d dest2 = Vect3d(0.0f, 1.0f, 0.0f).add(vAux);
 
 		RayLine3d r1(vAux, dest1);
 		RayLine3d r2(vAux, dest2);
@@ -340,9 +331,7 @@ bool Octree::isInsideModel(const Vect3d& v)
 			return true;
 		}
 
-		Vect3d dest3(RandomUtilities::getUniformRandom(aabb.getMin().getX(), aabb.getMax().getX()),
-			RandomUtilities::getUniformRandom(aabb.getMin().getY(), aabb.getMax().getY()),
-			RandomUtilities::getUniformRandom(aabb.getMin().getZ(), aabb.getMax().getZ()));
+		Vect3d dest3 = Vect3d(0.0f, 0.0f, 1.0f).add(vAux);
 
 		RayLine3d r3(vAux, dest3);
 

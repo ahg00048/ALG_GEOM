@@ -159,7 +159,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>Fonts/;Patterns/;Rendering/;Geometry/;PrecompiledHeaders/;../../Libraries/ImGuiFileDialog</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Fonts/;Patterns/;Util/;Rendering/;Geometry/;PrecompiledHeaders/;../../Libraries/ImGuiFileDialog</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>

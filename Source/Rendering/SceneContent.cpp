@@ -840,15 +840,9 @@ void AlgGeom::SceneContent::pr3()
 
     for (Vect3d& point : pcPoints)
     {
-        float range = 1000.0f;
-
-        Vect3d dest1(RandomUtilities::getUniformRandom(-range, range),
-            RandomUtilities::getUniformRandom(-range, range),
-            RandomUtilities::getUniformRandom(-range, range));
-        Vect3d dest2(RandomUtilities::getUniformRandom(-range, range),
-            RandomUtilities::getUniformRandom(-range, range),
-            RandomUtilities::getUniformRandom(-range, range));
-
+        Vect3d dest1 = Vect3d(1.0f, 0.0f, 0.0f).add(point); 
+		Vect3d dest2 = Vect3d(1.0f, 0.0f, 0.0f).add(point);
+     
         RayLine3d r1(point, dest1);
         RayLine3d r2(point, dest2);
 
@@ -866,9 +860,7 @@ void AlgGeom::SceneContent::pr3()
             continue;
         }
 
-        Vect3d dest3(RandomUtilities::getUniformRandom(-range, range),
-            RandomUtilities::getUniformRandom(-range, range),
-            RandomUtilities::getUniformRandom(-range, range));
+        Vect3d dest3 = Vect3d(1.0f, 0.0f, 0.0f).add(point);
 
         RayLine3d r3(point, dest3);
 

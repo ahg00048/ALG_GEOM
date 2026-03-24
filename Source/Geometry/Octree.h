@@ -70,7 +70,7 @@ private:
 
 public:
 	static const unsigned int MAX_TRI_NODE = 40;
-	static const unsigned int MAX_LEVELS = 8;
+	static const unsigned int MAX_LEVELS = 9;
 
 public:
 	Octree();

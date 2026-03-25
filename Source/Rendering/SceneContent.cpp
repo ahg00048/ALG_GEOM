@@ -14,7 +14,7 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    pr4();
+    triDrawTest();
 }
 
 
@@ -792,9 +792,9 @@ void AlgGeom::SceneContent::pr3()
     }
 
     float lineWidth = 3.0f;
-    addNewModel((new DrawOctree(grayNodes))->setLineColor(vec3(0.7f))->setLineWidth(lineWidth)->overrideModelName());
-    addNewModel((new DrawOctree(whiteNodes))->setLineColor(vec3(1.0f))->setLineWidth(lineWidth)->overrideModelName());
-    addNewModel((new DrawOctree(blackNodes))->setLineColor(vec3(0.0f))->setLineWidth(lineWidth)->overrideModelName());
+    addNewModel((new DrawOctree(grayNodes, true))->setLineColor(vec3(0.7f))->setTriangleColor(vec4(vec3(0.7f), 1.0f))->setLineWidth(lineWidth)->overrideModelName());
+    addNewModel((new DrawOctree(whiteNodes, true))->setLineColor(vec3(1.0f))->setTriangleColor(vec4(vec3(1.0f), 1.0f))->setLineWidth(lineWidth)->overrideModelName());
+    addNewModel((new DrawOctree(blackNodes, true))->setLineColor(vec3(0.0f))->setTriangleColor(vec4(vec3(0.0f), 1.0f))->setLineWidth(lineWidth)->overrideModelName());
 
     // 3 - Crear una nube de al menos 100 puntos dibujando de forma diferente los que están dentro de los que están fuera usando el nuevo método. -- HECHO
     int pcSize = 100;
@@ -906,7 +906,54 @@ void AlgGeom::SceneContent::pr3()
 
 void AlgGeom::SceneContent::pr4()
 {
+    // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado. -- HECHO
+    const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/vaca.obj";
+    TriangleModel* tModel1 = new TriangleModel(filePath);
+    TriangleModel* tModel2 = new TriangleModel(filePath);
 
+    //MOVER MODELOS
+    
+    //
+
+    Octree* oct1 = new Octree(*tModel1);
+    Octree* oct2 = new Octree(*tModel2);
+
+    addNewModel((new DrawMesh(*tModel1))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
+    addNewModel((new DrawOctree(*oct1))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
+    
+    addNewModel((new DrawMesh(*tModel2))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
+    addNewModel((new DrawOctree(*oct2))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
+
+    // 2 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación. -- HECHO
+    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+
+    oct1->classifyColor();
+    oct2->classifyColor();
+
+    std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
+    double duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    constexpr const char* fmt = "\nEXERCISE {}: \n  Time of the operation: {} ms \n\n";
+}
+
+void AlgGeom::SceneContent::triDrawTest()
+{
+    Vect3d aV1(-1.0f, -1.0f, 0.0f);
+    Vect3d aV2(1.0f, -1.0f, 0.0f);
+    Vect3d aV3(0.0f, 1.0f, 0.0f);
+
+    Vect3d bV1(-1.0f, -1.0f, 0.0f);
+    Vect3d bV2(1.0f, -1.0f, 0.0f);
+    Vect3d bV3(0.0f, -3.0f, 0.0f);
+
+    Triangle3d A(aV1, aV2, aV3);
+    Triangle3d B(bV1, bV2, bV3);
+
+    std::vector<Triangle3d*> tris;
+    tris.push_back(&A);
+    tris.push_back(&B);
+
+    addNewModel((new DrawMesh(tris))->overrideModelName()->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f)));
 }
 
 void AlgGeom::SceneContent::triTriTest()

@@ -32,6 +32,7 @@ namespace AlgGeom
 
 	public:
 		DrawMesh(TriangleModel& triangleModel);
+		DrawMesh(std::vector<Triangle3d*>& triangles);
 		DrawMesh(const DrawMesh& drawMesh) = delete;
 		~DrawMesh() override {};
 

@@ -35,6 +35,7 @@ namespace AlgGeom
 		//tests
 		void triTriTest();
 		void boxBoxTest();
+		void triDrawTest();
 
 		Point randomPointInUnitDisk(float diskR);
 	};

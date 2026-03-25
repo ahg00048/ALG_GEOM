@@ -324,7 +324,7 @@ void Octree::clear()
 bool Octree::isInsideModel(const Vect3d& v)
 {
 	Node* curr = &_root;
-	bool isInside = true;
+	bool loopCondition = true;
 
 	Vect3d min = curr->getAABB().getMin();
 	Vect3d max = curr->getAABB().getMax();
@@ -333,12 +333,12 @@ bool Octree::isInsideModel(const Vect3d& v)
 		v.getY() >= min.getY() && v.getY() <= max.getY() &&
 		v.getZ() >= min.getZ() && v.getZ() <= max.getZ()))
 	{
-		isInside = false;
+		loopCondition = false;
 	}
 
-	while (isInside && curr->hasChildren())
+	while (loopCondition && curr->hasChildren())
 	{
-		isInside = false;
+		loopCondition = false;
 
 		Node* children = curr->getChildren();
 		for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
@@ -351,7 +351,7 @@ bool Octree::isInsideModel(const Vect3d& v)
 				v.getZ() >= min.getZ() && v.getZ() <= max.getZ())
 			{
 				curr = &children[i];
-				isInside = true;
+				loopCondition = true;
 				break;
 			}
 		}

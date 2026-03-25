@@ -31,7 +31,7 @@ AlgGeom::DrawTriangle::DrawTriangle(Triangle3d& triangle) : Model3D()
         });
     component->_indices[VAO::IBO_TRIANGLE].insert(component->_indices[VAO::IBO_TRIANGLE].end(), { 0, 1, 2, RESTART_PRIMITIVE_INDEX });
     component->completeTopology();
+    
     this->_components.push_back(std::unique_ptr<Component>(component));
-
     this->buildVao(component);
 }

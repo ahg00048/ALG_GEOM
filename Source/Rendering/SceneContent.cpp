@@ -743,6 +743,10 @@ void AlgGeom::SceneContent::pr2D()
     delete s3;
 }
 
+/*
+* PR3 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+
 void AlgGeom::SceneContent::pr3()
 {
     // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado. -- HECHO

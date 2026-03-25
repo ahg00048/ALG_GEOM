@@ -4,13 +4,13 @@
 // Node
 
 Octree::Node::Node(int level, Vect3d min, Vect3d max, Octree* oct) :
-	_level(level), _min(min), _max(max), _oct(oct), _type(TypeColorNode::WHITE), _children(nullptr)
+	_level(level), _min(min), _max(max), _oct(oct), _type(TypeColorNode::NOT_PROCESSED), _children(nullptr)
 {
 
 }
 
 Octree::Node::Node() :
-	_level(-1), _min(), _max(), _oct(nullptr), _type(TypeColorNode::WHITE), _children(nullptr)
+	_level(-1), _min(), _max(), _oct(nullptr), _type(TypeColorNode::NOT_PROCESSED), _children(nullptr)
 {
 
 }
@@ -167,7 +167,7 @@ void Octree::Node::classifyColor(TriangleModel& model)
 	}
 }
 
-// Octree
+// Octree -------------------------------------------------------------------------------------------------------------------------------------
 
 Octree::Octree() :
 	_triangles(), _root(), _optimized(false)
@@ -223,13 +223,71 @@ Octree::~Octree()
 
 void Octree::classifyColor()
 {
-	std::vector<Octree::Node*> nodes = getLeafNodes();
+	std::stack<Octree::Node*> nodes;
+	std::vector<Octree::Node*> vNodes;
+	nodes.push(&_root);
 
-	unsigned int i = 0;
-	for (Octree::Node* n : nodes)
-	{	
-		n->classifyColor(*_model);
+	while (!nodes.empty())
+	{
+		Node* curr = nodes.top();
+
+		while (curr->hasChildren() && std::find(vNodes.begin(), vNodes.end(), curr) == vNodes.end())
+		{
+			Node* children = curr->getChildren();
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
+			{
+				nodes.push(&children[i]);
+			}
+
+			vNodes.push_back(curr);
+			curr = nodes.top();
+		}
+
+		if (curr->hasChildren())
+		{
+			Node* children = curr->getChildren();
+			unsigned int whiteCounter = 0;
+
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
+			{
+				Octree::Node::TypeColorNode nType = children[i].getType();
+				if (nType == Octree::Node::TypeColorNode::GRAY)
+				{
+					curr->setType(Octree::Node::TypeColorNode::GRAY);
+					break;
+				} 
+				else if (nType == Octree::Node::TypeColorNode::WHITE)
+				{
+					whiteCounter++;
+				}
+			}
+
+			if (curr->getType() == Octree::Node::TypeColorNode::NOT_PROCESSED)
+			{
+				if (whiteCounter == 0)
+					curr->setType(Octree::Node::TypeColorNode::BLACK);
+				else if (whiteCounter == Octree::Node::N_CHILDREN)
+					curr->setType(Octree::Node::TypeColorNode::WHITE);
+				else
+					curr->setType(Octree::Node::TypeColorNode::GRAY);
+			}
+		}
+		else
+		{
+			curr->classifyColor(*_model);
+		}
+
+		curr = nullptr;
+		nodes.pop();
 	}
+	
+	//std::vector<Octree::Node*> nodes = getLeafNodes();
+
+	//unsigned int i = 0;
+	//for (Octree::Node* n : nodes)
+	//{	
+	//	n->classifyColor(*_model);
+	//}
 }
 
 void Octree::clear()

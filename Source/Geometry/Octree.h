@@ -19,7 +19,8 @@ public:
 		{
 			WHITE = 0,
 			BLACK,
-			GRAY
+			GRAY,
+			NOT_PROCESSED
 		};
 
 		const static unsigned int N_CHILDREN = 8;
@@ -52,6 +53,7 @@ public:
 		void setMin(const Vect3d& min) { _min = min; }
 		void setMax(const Vect3d& max) { _max = max; }
 		void setOctree(Octree* oct) { _oct = oct; }
+		void setType(TypeColorNode type) { _type = type; }
 
 		void insertTriangle(Triangle3d* tri);
 		

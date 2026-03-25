@@ -100,4 +100,6 @@ public:
 	void update(const AABB& aabb);
 
 	void update(const vec3& point);
+
+	bool boxBox(AABB& aabb) const;
 };

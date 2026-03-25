@@ -14,7 +14,9 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    pr3();
+    //pr3();
+    triTriTest();
+    //boxBoxTest();
 }
 
 
@@ -898,6 +900,61 @@ void AlgGeom::SceneContent::pr3()
     delete pc; 
     delete oct;
     delete tModel;
+}
+
+void AlgGeom::SceneContent::triTriTest()
+{
+    Vect3d aV1(-1.0f, -1.0f, 0.0f);
+    Vect3d aV2(1.0f, -1.0f, 0.0f);
+    Vect3d aV3(0.0f, 1.0f, 0.0f);
+
+    Vect3d bV1(-0.5f, -0.5f, 0.0f);
+    Vect3d bV2(0.5f, -0.5f, 0.0f);
+    Vect3d bV3(0.0f, 0.5f, 0.0f);
+
+    Vect3d cV1(-1.0f, -1.0f, -1.0f);
+    Vect3d cV2(1.0f, -1.0f, -1.0f);
+    Vect3d cV3(0.0f, 1.0f, -1.0f);
+
+    Triangle3d A(aV1, aV2, aV3);
+    Triangle3d B(bV1, bV2, bV3);
+    Triangle3d C(cV1, cV2, cV3);
+
+    addNewModel((new DrawTriangle(A))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());    // rojo
+    addNewModel((new DrawTriangle(B))->setTriangleColor(vec4(0.0f, 1.0f, 0.0f, 1.0f))->overrideModelName());    // verde
+    addNewModel((new DrawTriangle(C))->setTriangleColor(vec4(0.0f, 0.0f, 1.0f, 1.0f))->overrideModelName());    // azul
+
+    constexpr const char* fmt = "Intersection between {} and {} -> {}\n";
+    std::cout << std::format(fmt, "RED", "GREEN", A.triTri(B));
+    std::cout << std::format(fmt, "GREEN", "RED", B.triTri(A));
+    std::cout << std::format(fmt, "RED", "BLUE", A.triTri(C));
+    std::cout << std::format(fmt, "GREEN", "BLUE", B.triTri(C));
+}
+
+void AlgGeom::SceneContent::boxBoxTest()
+{
+
+    Vect3d aV1(-1.0f, -1.0f, -1.0f);
+    Vect3d aV2(1.0f, 1.0f, 1.0f);
+    
+    Vect3d bV1(-0.5f, -0.5f, -0.5f);
+    Vect3d bV2(0.5f, 0.5f, 0.5f);
+    
+    Vect3d cV1(-2.0f, -2.0f, -2.0f);
+    Vect3d cV2(-1.5f, -1.5f, -1.5f);
+
+    AABB A(aV1, aV2);
+    AABB B(bV1, bV2);
+    AABB C(cV1, cV2);
+
+    addNewModel((new DrawAABB(A))->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f))->overrideModelName());    // rojo
+    addNewModel((new DrawAABB(B))->setTriangleColor(vec4(0.0f, 1.0f, 0.0f, 1.0f))->overrideModelName());    // verde
+    addNewModel((new DrawAABB(C))->setTriangleColor(vec4(0.0f, 0.0f, 1.0f, 1.0f))->overrideModelName());    // azul
+
+    constexpr const char* fmt = "Intersection between {} and {} -> {}\n";
+    std::cout << std::format(fmt, "RED", "GREEN", A.boxBox(B));
+    std::cout << std::format(fmt, "RED", "BLUE", A.boxBox(C));
+    std::cout << std::format(fmt, "GREEN", "BLUE", B.boxBox(C));
 }
 
 Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)

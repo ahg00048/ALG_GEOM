@@ -70,3 +70,13 @@ void AABB::update(const vec3& point)
 	if (point.y > _max.getY()) { _max.setY(point.y); }
 	if (point.z > _max.getZ()) { _max.setZ(point.z); }
 }
+
+bool AABB::boxBox(AABB& other) const
+{
+	// Si en cualquier eje están separados, el SAT retorna falso 
+	if (_max.getX() < other._min.getX() || _min.getX() > other._max.getX()) return false;
+	if (_max.getY() < other._min.getY() || _min.getY() > other._max.getY()) return false;
+	if (_max.getZ() < other._min.getZ() || _min.getZ() > other._max.getZ()) return false; // Si no hay separación en ningún eje, hay colisión return true;
+
+	return true;
+}

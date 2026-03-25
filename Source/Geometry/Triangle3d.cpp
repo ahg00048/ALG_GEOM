@@ -3,6 +3,7 @@
 #include "Triangle3d.h"
 #include "Edge3d.h"
 
+/*======================= AABB-TRI ========================*/
 
 /*======================== X-tests ========================*/
 
@@ -49,13 +50,114 @@ rad = fa * boxHalfSize.getX() + fb * boxHalfSize.getY();					\
 if (min > rad || max < -rad) return false;
 
 #define AXISTEST_Z0(a, b, fa, fb)											\
-p0 = a * v0.getX() - b * v0.getY();												\
-p1 = a * v1.getX() - b * v1.getY();												\
+p0 = a * v0.getX() - b * v0.getY();											\
+p1 = a * v1.getX() - b * v1.getY();											\
 if (p0 < p1) { min = p0; max = p1; } else { min = p1; max = p0; }			\
 rad = fa * boxHalfSize.getX() + fb * boxHalfSize.getY();					\
 if (min > rad || max < -rad) return false;
 
 /*======================== end-tests ========================*/
+
+/*========================= tri-tri =========================*/
+
+#define NEWCOMPUTE_INTERVALS(VV0,VV1,VV2,D0,D1,D2,D0D1,D0D2,A,B,C,X0,X1)				\
+{																						\
+        if(D0D1>0.0f)																	\
+        {																				\
+            /* here we know that D0D2<=0.0 */											\
+            /* that is D0, D1 are on the same side, D2 on the other or on the plane */	\
+            A=VV2; B=(VV0-VV2)*D2; C=(VV1-VV2)*D2; X0=D2-D0; X1=D2-D1;					\
+        }																				\
+        else if(D0D2>0.0f)																\
+        {																				\
+                /* here we know that d0d1<=0.0 */										\
+	        A=VV1; B=(VV0-VV1)*D1; C=(VV2-VV1)*D1; X0=D1-D0; X1=D1-D2;					\
+        }																				\
+        else if(D1*D2>0.0f || D0!=0.0f)													\
+        {																				\
+            /* here we know that d0d1<=0.0 or that D0!=0.0 */							\
+            A=VV0; B=(VV1-VV0)*D0; C=(VV2-VV0)*D0; X0=D0-D1; X1=D0-D2;					\
+        }																				\
+        else if(D1!=0.0f)																\
+        {																				\
+            A=VV1; B=(VV0-VV1)*D1; C=(VV2-VV1)*D1; X0=D1-D0; X1=D1-D2;					\
+        }																				\
+        else if(D2!=0.0f)																\
+        {																				\
+            A=VV2; B=(VV0-VV2)*D2; C=(VV1-VV2)*D2; X0=D2-D0; X1=D2-D1;					\
+        }																				\
+        else																			\
+        {																				\
+            /* triangles are coplanar */												\
+            return coplanar_tri_tri(N1, aAux, bAux, cAux, otherA, otherB, otherC);		\
+        }																				\
+}
+
+/*========================= EDGE-EDGE =========================*/
+
+#define EDGE_EDGE_TEST(V0,U0,U1)                      \
+  Bx=U0.get(i0)-U1.get(i0);                           \
+  By=U0.get(i1)-U1.get(i1);                           \
+  Cx=V0.get(i0)-U0.get(i0);                           \
+  Cy=V0.get(i1)-U0.get(i1);                           \
+  f=Ay*Bx-Ax*By;                                      \
+  d=By*Cx-Bx*Cy;                                      \
+  if((f>0 && d>=0 && d<=f) || (f<0 && d<=0 && d>=f))  \
+  {                                                   \
+    e=Ax*Cy-Ay*Cx;                                    \
+    if(f>0)                                           \
+    {                                                 \
+      if(e>=0 && e<=f) return 1;                      \
+    }                                                 \
+    else                                              \
+    {                                                 \
+      if(e<=0 && e>=f) return 1;                      \
+    }                                                 \
+  }
+
+/*========================= EDGE-EDGE =========================*/
+
+#define EDGE_AGAINST_TRI_EDGES(V0,V1,U0,U1,U2)	\
+{												\
+  float Ax,Ay,Bx,By,Cx,Cy,e,d,f;				\
+  Ax=V1.get(i0)-V0.get(i0);						\
+  Ay=V1.get(i1)-V0.get(i1);						\
+  /* test edge U0,U1 against V0,V1 */			\
+  EDGE_EDGE_TEST(V0,U0,U1);						\
+  /* test edge U1,U2 against V0,V1 */			\
+  EDGE_EDGE_TEST(V0,U1,U2);						\
+  /* test edge U2,U1 against V0,V1 */			\
+  EDGE_EDGE_TEST(V0,U2,U0);						\
+}
+
+/*========================= POINT =========================*/
+
+#define POINT_IN_TRI(V0,U0,U1,U2)					\
+{													\
+  float a,b,c,d0,d1,d2;								\
+  /* is T1 completly inside T2? */					\
+  /* check if V0 is inside tri(U0,U1,U2) */			\
+  a=U1.get(i1)-U0.get(i1);                          \
+  b=-(U1.get(i0)-U0.get(i0));                       \
+  c=-a*U0.get(i0)-b*U0.get(i1);                     \
+  d0=a*V0.get(i0)+b*V0.get(i1)+c;                   \
+													\
+  a=U2.get(i1)-U1.get(i1);                          \
+  b=-(U2.get(i0)-U1.get(i0));                       \
+  c=-a*U1.get(i0)-b*U1.get(i1);                     \
+  d1=a*V0.get(i0)+b*V0.get(i1)+c;                   \
+									                \
+  a=U0.get(i1)-U2.get(i1);                          \
+  b=-(U0.get(i0)-U2.get(i0));                       \
+  c=-a*U2.get(i0)-b*U2.get(i1);                     \
+  d2=a*V0.get(i0)+b*V0.get(i1)+c;                   \
+  if(d0*d1>0.0)										\
+  {													\
+    if(d0*d2>0.0) return 1;							\
+  }													\
+}
+
+/*========================================================================*/
 
 Triangle3d::Triangle3d()
 {
@@ -329,6 +431,187 @@ bool Triangle3d::planeBoxOverlap(Vect3d normal, Vect3d vert, Vect3d maxbox)	cons
 
 	if (normal.dot(vmin) > 0.0f) return false;		// -NJMP-
 	if (normal.dot(vmax) >= 0.0f) return true;	// -NJMP-
+
+	return false;
+}
+
+bool Triangle3d::triTri(Triangle3d& tri) const
+{
+	Vect3d E1, E2;
+	Vect3d N1, N2;
+	float d1, d2;
+	float du0, du1, du2, dv0, dv1, dv2;
+	Vect3d D;
+	float isect1[2], isect2[2];
+	float du0du1, du0du2, dv0dv1, dv0dv2;
+	short index;
+	float vp0, vp1, vp2;
+	float up0, up1, up2;
+	float bb, cc, max;
+
+	Vect3d aAux = _a;
+	Vect3d bAux = _b;
+	Vect3d cAux = _c;
+
+	/* compute plane equation of triangle(V0,V1,V2) */
+	E1 = _b.sub(_a);
+	E2 = _c.sub(_a);
+	N1 = E1.xProduct(E2);
+
+	d1 = -N1.dot(aAux);
+	/* plane equation 1: N1.X+d1=0 */
+
+	/* put U0,U1,U2 into plane equation 1 to compute signed distances to the plane*/
+	Vect3d otherA = tri.getA();
+	Vect3d otherB = tri.getB();
+	Vect3d otherC = tri.getC();
+	
+	du0 = N1.dot(otherA) + d1;
+	du1 = N1.dot(otherB) + d1;
+	du2 = N1.dot(otherC) + d1;
+
+	/* coplanarity robustness check */
+
+	if (fabsf(du0) < BasicGeometry::EPSILON) du0 = 0.0;
+	if (fabsf(du1) < BasicGeometry::EPSILON) du1 = 0.0;
+	if (fabsf(du2) < BasicGeometry::EPSILON) du2 = 0.0;
+
+	du0du1 = du0 * du1;
+	du0du2 = du0 * du2;
+
+	if (du0du1 > 0.0f && du0du2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+		return false;                    /* no intersection occurs */
+
+	/* compute plane of triangle (U0,U1,U2) */
+	E1 = otherB.sub(otherA);
+	E2 = otherC.sub(otherA);
+	N2 = E1.xProduct(E2);
+	d2 = -N2.dot(otherA);
+	/* plane equation 2: N2.X+d2=0 */
+
+	/* put V0,V1,V2 into plane equation 2 */
+	dv0 = N2.dot(aAux) + d2;
+	dv1 = N2.dot(bAux) + d2;
+	dv2 = N2.dot(cAux) + d2;
+
+	if (fabsf(dv0) < BasicGeometry::EPSILON) dv0 = 0.0;
+	if (fabsf(dv1) < BasicGeometry::EPSILON) dv1 = 0.0;
+	if (fabsf(dv2) < BasicGeometry::EPSILON) dv2 = 0.0;
+
+	dv0dv1 = dv0 * dv1;
+	dv0dv2 = dv0 * dv2;
+
+	if (dv0dv1 > 0.0f && dv0dv2 > 0.0f) /* same sign on all of them + not equal 0 ? */
+		return false;                    /* no intersection occurs */
+
+	/* compute direction of intersection line */
+	D = N1.xProduct(N2);
+
+	/* compute and index to the largest component of D */
+	max = fabsf(D.getX());
+	index = 0;
+	bb = fabsf(D.getY());
+	cc = fabsf(D.getZ());
+	if (bb > max) max = bb, index = 1;
+	if (cc > max) max = cc, index = 2;
+
+	/* this is the simplified projection onto L*/
+	vp0 = aAux.get(index);
+	vp1 = bAux.get(index);
+	vp2 = cAux.get(index);
+
+	up0 = otherA.get(index);
+	up1 = otherB.get(index);
+	up2 = otherC.get(index);
+
+	/* compute interval for triangle 1 */
+	float a, b, c, x0, x1;
+	NEWCOMPUTE_INTERVALS(vp0, vp1, vp2, dv0, dv1, dv2, dv0dv1, dv0dv2, a, b, c, x0, x1);
+
+	/* compute interval for triangle 2 */
+	float d, e, f, y0, y1;
+	NEWCOMPUTE_INTERVALS(up0, up1, up2, du0, du1, du2, du0du1, du0du2, d, e, f, y0, y1);
+
+	float xx, yy, xxyy, tmp;
+	xx = x0 * x1;
+	yy = y0 * y1;
+	xxyy = xx * yy;
+
+	tmp = a * xxyy;
+	isect1[0] = tmp + b * x1 * yy;
+	isect1[1] = tmp + c * x0 * yy;
+
+	tmp = d * xxyy;
+	isect2[0] = tmp + e * xx * y1;
+	isect2[1] = tmp + f * xx * y0;
+
+	if (isect1[0] > isect1[1])
+	{          
+		float c; 
+		c = isect1[0];
+		isect1[0] = isect1[1];
+		isect1[1] = c;
+	}
+
+	if (isect2[0] > isect2[1])
+	{          
+		float c; 
+		c = isect2[0];
+		isect2[0] = isect2[1];
+		isect2[1] = c;
+	}
+
+	if (isect1[1] < isect2[0] || isect2[1] < isect1[0]) return false;
+	
+	return true;
+}
+
+bool Triangle3d::coplanar_tri_tri(Vect3d N, Vect3d V0, Vect3d V1, Vect3d V2,
+	Vect3d U0, Vect3d U1, Vect3d U2) const
+{
+	Vect3d A;
+	short i0, i1;
+	/* first project onto an axis-aligned plane, that maximizes the area */
+	/* of the triangles, compute indices: i0,i1. */
+	A.setX(fabs(N.getX()));
+	A.setY(fabs(N.getY()));
+	A.setZ(fabs(N.getZ()));
+
+	if (A.getX() > A.getY())
+	{
+		if (A.getX() > A.getZ())
+		{
+			i0 = 1;      /* A[0] is greatest */
+			i1 = 2;
+		}
+		else
+		{
+			i0 = 0;      /* A[2] is greatest */
+			i1 = 1;
+		}
+	}
+	else   /* A[0]<=A[1] */
+	{
+		if (A.getZ() > A.getY())
+		{
+			i0 = 0;      /* A[2] is greatest */
+			i1 = 1;
+		}
+		else
+		{
+			i0 = 0;      /* A[1] is greatest */
+			i1 = 2;
+		}
+	}
+
+	/* test all edges of triangle 1 against the edges of triangle 2 */
+	EDGE_AGAINST_TRI_EDGES(V0, V1, U0, U1, U2);
+	EDGE_AGAINST_TRI_EDGES(V1, V2, U0, U1, U2);
+	EDGE_AGAINST_TRI_EDGES(V2, V0, U0, U1, U2);
+
+	/* finally, test if tri1 is totally contained in tri2 or vice versa */
+	POINT_IN_TRI(V0, U0, U1, U2);
+	POINT_IN_TRI(U0, V0, V1, V2);
 
 	return false;
 }

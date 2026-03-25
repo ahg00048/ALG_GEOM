@@ -63,6 +63,8 @@ protected:
 
 private:
 	bool planeBoxOverlap(Vect3d normal, Vect3d vert, Vect3d maxbox) const;	// -NJMP-
+	bool coplanar_tri_tri(Vect3d N, Vect3d V0, Vect3d V1, Vect3d V2,
+		Vect3d U0, Vect3d U1, Vect3d U2) const;
 
 public:
 	/**
@@ -103,6 +105,8 @@ public:
 	bool rayTri(RayLine3d& r, Vect3d& v) const;
 
 	bool triAABB(AABB& aabb) const;
+
+	bool triTri(Triangle3d& tri) const;
 
 	AABB getAABB() const;
 

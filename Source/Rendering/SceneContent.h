@@ -30,6 +30,7 @@ namespace AlgGeom
 		void pr2A_B_C();
 		void pr2D();
 		void pr3();
+		void pr4();
 
 		//tests
 		void triTriTest();

@@ -101,5 +101,5 @@ public:
 
 	void update(const vec3& point);
 
-	bool boxBox(AABB& aabb) const;
+	bool boxBox(const AABB& aabb) const;
 };

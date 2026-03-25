@@ -47,7 +47,8 @@ public:
 		Node* getChildren() const{ return _children; }
 		int getLevel() const { return _level; }
 		TypeColorNode getType() const { return _type; }
-		
+		std::vector<Triangle3d*>& getTriangles() { return _triangles; }
+
 		AABB getAABB() const { return AABB(_min, _max); }
 
 		void setMin(const Vect3d& min) { _min = min; }
@@ -74,6 +75,9 @@ public:
 	static const unsigned int MAX_TRI_NODE = 40;
 	static const unsigned int MAX_LEVELS = 9;
 
+private:
+	void collide(Octree::Node* thisNode, Octree::Node* otherNode, std::vector<Triangle3d*>& triangles, std::vector<std::pair<Octree::Node*, Octree::Node*>>& nodes);
+
 public:
 	Octree();
 	Octree(TriangleModel& model);
@@ -88,6 +92,8 @@ public:
 	void insertTriangle(Triangle3d& tri) { _root.insertTriangle(&tri); }
 	bool isInsideModel(const Vect3d& v);
 	void classifyColor();
+
+	void collide(Octree& other, std::vector<Triangle3d*>& triangles, std::vector<std::pair<Octree::Node*, Octree::Node*>>& nodes);
 
 	std::vector<Node*> getLeafNodes();
 };

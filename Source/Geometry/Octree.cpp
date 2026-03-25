@@ -439,3 +439,85 @@ std::vector<Octree::Node*> Octree::getLeafNodes()
 
 	return result;
 }
+
+void Octree::collide(Octree& other, std::vector<Triangle3d*>& triangles, std::vector<std::pair<Octree::Node*, Octree::Node*>>& nodes)
+{
+	collide(&_root, &other._root, triangles, nodes);
+
+	std::vector<Triangle3d*> thisTriangles;
+	std::vector<Triangle3d*> OtherTriangles;
+	
+	for (auto& nodePair : nodes)
+	{
+		std::vector<Triangle3d*> nThisTris = nodePair.first->getTriangles();
+		std::vector<Triangle3d*> nOtherTris = nodePair.second->getTriangles();
+		
+		for (Triangle3d* tri1 : nThisTris)
+		{
+			bool collision = false;
+			for (Triangle3d* tri2 : nOtherTris)
+			{
+				if (tri1->triTri(*tri2))
+				{
+					triangles.push_back(tri2);
+					collision = true;
+				}
+			}
+
+			if(collision)
+				triangles.push_back(tri1);
+		}
+	}
+}
+
+void Octree::collide(Octree::Node* thisNode, Octree::Node* otherNode, std::vector<Triangle3d*>& triangles, std::vector<std::pair<Octree::Node*, Octree::Node*>>& nodes)
+{
+	std::vector<Octree::Node*> vThisNodes;
+	std::vector<Octree::Node*> vOtherNodes;
+	
+	if (thisNode->getAABB().boxBox(otherNode->getAABB()))
+	{
+		if ((thisNode->hasChildren() && otherNode->hasChildren()))
+		{
+			Octree::Node* thisChildren = thisNode->getChildren();
+			Octree::Node* otherChildren = otherNode->getChildren();
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
+			{
+				vThisNodes.push_back(thisChildren + i);
+				vOtherNodes.push_back(otherChildren + i);
+			}
+		}
+		else if (thisNode->hasChildren())
+		{
+			Octree::Node* thisChildren = thisNode->getChildren();
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
+			{
+				vThisNodes.push_back(thisChildren + i);
+			}
+			
+			vOtherNodes.push_back(otherNode);
+		} 
+		else if (otherNode->hasChildren())
+		{
+			Octree::Node* otherChildren = otherNode->getChildren();
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
+			{
+				vOtherNodes.push_back(otherChildren + i);
+			}
+		
+			vThisNodes.push_back(thisNode);
+		}
+		else
+		{
+			nodes.push_back( { thisNode, otherNode } );
+		}
+
+		for (Octree::Node*& n1 : vThisNodes)
+		{
+			for (Octree::Node*& n2 : vOtherNodes)
+			{
+				collide(n1, n2, triangles, nodes);
+			}
+		}
+	}
+}

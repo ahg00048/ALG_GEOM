@@ -14,9 +14,7 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    //pr3();
-    triTriTest();
-    //boxBoxTest();
+    pr4();
 }
 
 
@@ -900,6 +898,15 @@ void AlgGeom::SceneContent::pr3()
     delete pc; 
     delete oct;
     delete tModel;
+}
+
+/*
+* PR4 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+
+void AlgGeom::SceneContent::pr4()
+{
+
 }
 
 void AlgGeom::SceneContent::triTriTest()

@@ -71,7 +71,7 @@ void AABB::update(const vec3& point)
 	if (point.z > _max.getZ()) { _max.setZ(point.z); }
 }
 
-bool AABB::boxBox(AABB& other) const
+bool AABB::boxBox(const AABB& other) const
 {
 	// Si en cualquier eje están separados, el SAT retorna falso 
 	if (_max.getX() < other._min.getX() || _min.getX() > other._max.getX()) return false;

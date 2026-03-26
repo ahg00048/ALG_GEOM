@@ -57,5 +57,7 @@ public:
     std::vector<unsigned>* getIndices() { return &_indices; }
     size_t numTriangles();
 
+    void translate(Vect3d translation);
+
     std::vector<Triangle3d> rayTraversal(RayLine3d& r);
 };

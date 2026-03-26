@@ -56,6 +56,12 @@ public:
 		void setOctree(Octree* oct) { _oct = oct; }
 		void setType(TypeColorNode type) { _type = type; }
 
+		void translate(Vect3d translation) 
+		{ 
+			_min = _min.add(translation); 
+			_max = _max.add(translation); 
+		}
+
 		void insertTriangle(Triangle3d* tri);
 		
 		bool hasChildren();
@@ -94,6 +100,9 @@ public:
 	void classifyColor();
 
 	void collide(Octree& other, std::vector<Triangle3d*>& triangles, std::vector<std::pair<Octree::Node*, Octree::Node*>>& nodes);
+
+	Vect3d getCenter() { return _root.getAABB().getCenter(); };
+	void translate(Vect3d translation);
 
 	std::vector<Node*> getLeafNodes();
 };

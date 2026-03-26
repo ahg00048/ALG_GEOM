@@ -86,18 +86,13 @@ void AlgGeom::Model3D::draw(RenderingShader* shader, MatrixRenderInformation* ma
     }
 }
 
-AlgGeom::Model3D* AlgGeom::Model3D::moveGeometryToOrigin(const mat4& origMatrix, float maxScale)
+AlgGeom::Model3D* AlgGeom::Model3D::moveGeometryToOrigin()
 {
-    //AABB aabb = this->getAABB();
+    AABB aabb = this->getAABB();
 
-    //vec3 translate = -aabb.center();
-    //vec3 extent = aabb.extent();
-    //float maxScaleAABB = std::max(extent.x, std::max(extent.y, extent.z));
-    //vec3 scale = (maxScale < FLT_MAX) ? ((maxScale > maxScaleAABB) ? vec3(1.0f) : vec3(maxScale / maxScaleAABB)) : vec3(1.0f);
-
-    //_modelMatrix = glm::scale(glm::mat4(1.0f), scale) * glm::translate(glm::mat4(1.0f), translate) * origMatrix;
-
-    return this;
+    vec3 transalation = -vec3(aabb.getCenter());
+    
+    return translate(transalation);
 }
 
 AlgGeom::Model3D* AlgGeom::Model3D::overrideModelName()
@@ -206,6 +201,8 @@ void AlgGeom::Model3D::calculateAABB()
             vec3 pos = component->_vertices[0]._position;
             _aabb.setMax(Vect3d(pos));
             _aabb.setMin(Vect3d(pos));
+
+            break;
         }
 
     for (auto& component : _components)
@@ -410,4 +407,11 @@ void AlgGeom::Model3D::writeBinaryFile(const std::string& path)
     }
 
     fout.close();
+}
+
+AlgGeom::Model3D* AlgGeom::Model3D::translate(vec3 translation)
+{
+    _modelMatrix = glm::translate(_modelMatrix, translation);
+
+    return this;
 }

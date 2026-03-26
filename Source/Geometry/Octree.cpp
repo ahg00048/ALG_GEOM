@@ -521,3 +521,32 @@ void Octree::collide(Octree::Node* thisNode, Octree::Node* otherNode, std::vecto
 		}
 	}
 }
+
+void Octree::translate(Vect3d translation)
+{
+	for (Triangle3d& tri : _triangles)
+	{
+		tri.translate(translation);
+	}
+
+	std::stack<Octree::Node*> nodes;
+	nodes.push(&_root);
+
+	while (!nodes.empty())
+	{
+		Octree::Node* curr = nodes.top();
+		nodes.pop();
+
+		curr->translate(translation);
+
+		if (curr->hasChildren())
+		{
+			Octree::Node* children = curr->getChildren();
+
+			for (int i = 0; i < Octree::Node::N_CHILDREN; i++)
+			{
+				nodes.push(children + i);
+			}
+		}
+	}
+}

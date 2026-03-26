@@ -173,3 +173,11 @@ std::vector<Triangle3d> TriangleModel::rayTraversal(RayLine3d& r)
 
 	return result;
 }
+
+void TriangleModel::translate(Vect3d translation)
+{
+	for (Vect3d& v : _vertices)
+	{
+		v = v.add(translation);
+	}
+}

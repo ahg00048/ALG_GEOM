@@ -14,7 +14,7 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    triDrawTest();
+    pr4();
 }
 
 
@@ -911,40 +911,110 @@ void AlgGeom::SceneContent::pr4()
     TriangleModel* tModel1 = new TriangleModel(filePath);
     TriangleModel* tModel2 = new TriangleModel(filePath);
 
-    //MOVER MODELOS
-    
-    //
-
     Octree* oct1 = new Octree(*tModel1);
     Octree* oct2 = new Octree(*tModel2);
 
+    // MOVER MODELOS
+    Vect3d translation(0.0f, 0.0f, 5.0f);
+
+    // Al origen
+    oct1->translate(translation);
+    tModel1->translate(translation);
+
+    oct2->translate(translation);
+    tModel2->translate(translation);
+
+    // A la posicion deseada
+    translation = Vect3d(RandomUtilities::getUniformRandom() * 0.4f, RandomUtilities::getUniformRandom() * 0.4f, RandomUtilities::getUniformRandom() * 0.4f);
+
+    oct1->translate(translation);
+    tModel1->translate(translation);
+
+    oct2->translate(translation.scalarMul(-1.0f));
+    tModel2->translate(translation.scalarMul(-1.0f));
+
+    // Dibujamos
     addNewModel((new DrawMesh(*tModel1))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
     addNewModel((new DrawOctree(*oct1))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
-    
+
     addNewModel((new DrawMesh(*tModel2))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
     addNewModel((new DrawOctree(*oct2))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
 
-    // 2 - Clasificar el octree con los tres colores usando el método classify_color descrito anteriormente y medir el tiempo que se tarda en hacer esta clasificación. -- HECHO
-    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+    // Clasificamos
+    std::cout << "\nClassifying octrees...\n";
 
     oct1->classifyColor();
     oct2->classifyColor();
 
+    constexpr const char* fmt = "\nEXERCISE {}: \n  Time of the operation ({}): {} ms\n  Results in {}\n\n";
+
+    vec4 colColor1(1.0f, 0.0f, 0.0f, 1.0f);
+    vec4 colColor2(0.0f, 0.0f, 1.0f, 1.0f);
+
+    std::vector<Triangle3d*> triangles;
+    std::vector<std::pair<Octree::Node*, Octree::Node*>> pairCollidedNodes;
+    std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+
+    oct1->collide(*oct2, triangles, pairCollidedNodes);
+
     std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
     double duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
-    constexpr const char* fmt = "\nEXERCISE {}: \n  Time of the operation: {} ms \n\n";
+    std::cout << std::format(fmt, 6, "collision with octrees", duration, "red");
+
+    std::vector<Octree::Node*> collidedNodes;
+    for (auto& pair : pairCollidedNodes)
+    {
+        if (std::find(collidedNodes.begin(), collidedNodes.end(), pair.first) == collidedNodes.end())
+            collidedNodes.push_back(pair.first);
+        if (std::find(collidedNodes.begin(), collidedNodes.end(), pair.second) == collidedNodes.end())
+            collidedNodes.push_back(pair.second);
+    }
+
+    addNewModel((new DrawMesh(triangles))->setTriangleColor(colColor1)->overrideModelName());
+    addNewModel((new DrawOctree(collidedNodes, true))->setTriangleColor(colColor1)->overrideModelName());
+
+    triangles.clear();
+    std::vector<Triangle3d> model1Faces = tModel1->getFaces();
+    std::vector<Triangle3d> model2Faces = tModel2->getFaces();
+
+    start = std::chrono::system_clock::now();
+
+    for (Triangle3d& tri1 : model1Faces)
+    {
+        bool collision = false;
+
+        for (Triangle3d& tri2 : model2Faces)
+        {
+            if (tri1.triTri(tri2)) {
+                collision = true;
+                triangles.push_back(&tri2);
+            }
+        }
+
+        if (collision)
+            triangles.push_back(&tri1);
+    }
+
+    end = std::chrono::system_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    std::cout << std::format(fmt, 7, "collision without octrees", duration, "blue");
+
+    addNewModel((new DrawMesh(triangles))->setTriangleColor(colColor2)->overrideModelName());
 }
 
 void AlgGeom::SceneContent::triDrawTest()
 {
-    Vect3d aV1(-1.0f, -1.0f, 0.0f);
-    Vect3d aV2(1.0f, -1.0f, 0.0f);
-    Vect3d aV3(0.0f, 1.0f, 0.0f);
+    Vect3d offset(-2.0f, 2.0f, 2.0f);
 
-    Vect3d bV1(-1.0f, -1.0f, 0.0f);
-    Vect3d bV2(1.0f, -1.0f, 0.0f);
-    Vect3d bV3(0.0f, -3.0f, 0.0f);
+    Vect3d aV1(Vect3d(-1.0f, -1.0f, 0.0f).add(offset));
+    Vect3d aV2(Vect3d(1.0f, -1.0f, 0.0f).add(offset));
+    Vect3d aV3(Vect3d(0.0f, 1.0f, 0.0f).add(offset));
+
+    Vect3d bV1(Vect3d(-1.0f, -1.0f, 0.0f).add(offset));
+    Vect3d bV2(Vect3d(1.0f, -1.0f, 0.0f).add(offset));
+    Vect3d bV3(Vect3d(0.0f, -3.0f, 0.0f).add(offset));
 
     Triangle3d A(aV1, aV2, aV3);
     Triangle3d B(bV1, bV2, bV3);
@@ -953,7 +1023,10 @@ void AlgGeom::SceneContent::triDrawTest()
     tris.push_back(&A);
     tris.push_back(&B);
 
-    addNewModel((new DrawMesh(tris))->overrideModelName()->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f)));
+    Model3D* model = new DrawMesh(tris);
+    model->translate(-vec3(offset));
+
+    addNewModel((model)->overrideModelName()->setTriangleColor(vec4(1.0f, 0.0f, 0.0f, 1.0f)));
 }
 
 void AlgGeom::SceneContent::triTriTest()

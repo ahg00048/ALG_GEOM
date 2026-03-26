@@ -615,3 +615,10 @@ bool Triangle3d::coplanar_tri_tri(Vect3d N, Vect3d V0, Vect3d V1, Vect3d V2,
 
 	return false;
 }
+
+void Triangle3d::translate(Vect3d translation)
+{
+	_a = _a.add(translation);
+	_b = _b.add(translation);
+	_c = _c.add(translation);
+}

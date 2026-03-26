@@ -100,7 +100,7 @@ namespace AlgGeom
 		AABB getAABB() const { return _aabb.dot(_modelMatrix); } 
 		mat4 getModelMatrix() const { return _modelMatrix; }
 		std::string getName() { return _name; }
-		Model3D* moveGeometryToOrigin(const mat4& origMatrix = mat4(1.0f), float maxScale = FLT_MAX);
+		Model3D* moveGeometryToOrigin();
 		Model3D* overrideModelName();
 		Model3D* setModelMatrix(const mat4& modelMatrix) { _modelMatrix = modelMatrix; return this; }
 		Model3D* setLineColor(const vec3& color);
@@ -109,6 +109,8 @@ namespace AlgGeom
 		Model3D* setLineWidth(float width);
 		Model3D* setPointSize(float size);
 		Model3D* setTopologyVisibility(VAO::IBO_slots topology, bool visible);
+
+		Model3D* translate(vec3 translation);
 	};
 }
 

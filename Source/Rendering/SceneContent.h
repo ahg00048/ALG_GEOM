@@ -38,5 +38,6 @@ namespace AlgGeom
 		void triDrawTest();
 
 		Point randomPointInUnitDisk(float diskR);
+		void writeInTextFile(const std::string& filepath, const std::string& content);
 	};
 }

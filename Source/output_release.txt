@@ -1,0 +1,13 @@
+release
+
+Classifying octrees...
+
+EXERCISE 6: 
+  Time of the operation (collision with octrees): 3 ms
+  Results in red
+
+
+EXERCISE 7: 
+  Time of the operation (collision without octrees): 3236 ms
+  Results in blue
+

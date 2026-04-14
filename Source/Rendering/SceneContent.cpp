@@ -906,6 +906,15 @@ void AlgGeom::SceneContent::pr3()
 
 void AlgGeom::SceneContent::pr4()
 {
+#ifdef _DEBUG
+    std::string config = "debug";
+#else
+    std::string config = "release";
+#endif
+    std::string content = "";
+    content += config;
+    std::string textFilePath = "./output_" + config + ".txt" ;
+
     // 1 - Cargar algún modelo 3D y crear el octree correspondiente. Visualizar el resultado. -- HECHO
     const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/vaca.obj";
     TriangleModel* tModel1 = new TriangleModel(filePath);
@@ -940,8 +949,11 @@ void AlgGeom::SceneContent::pr4()
     addNewModel((new DrawMesh(*tModel2))->setLineColor({ 1.0f, 1.0f, 1.0f })->overrideModelName());
     addNewModel((new DrawOctree(*oct2))->setLineColor({ 0.0f, 0.0f, 0.0f })->overrideModelName());
 
+
+    std::string auxStr = "\n\nClassifying octrees...\n";
     // Clasificamos
-    std::cout << "\nClassifying octrees...\n";
+    std::cout << auxStr;
+    content += auxStr;
 
     oct1->classifyColor();
     oct2->classifyColor();
@@ -959,8 +971,10 @@ void AlgGeom::SceneContent::pr4()
 
     std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
     double duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
-    std::cout << std::format(fmt, 6, "collision with octrees", duration, "red");
+    
+    auxStr = std::format(fmt, 6, "collision with octrees", duration, "red");
+    std::cout << auxStr;
+    content += auxStr;
 
     std::vector<Octree::Node*> collidedNodes;
     for (auto& pair : pairCollidedNodes)
@@ -999,9 +1013,13 @@ void AlgGeom::SceneContent::pr4()
     end = std::chrono::system_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
+    auxStr = std::format(fmt, 7, "collision without octrees", duration, "blue");
     std::cout << std::format(fmt, 7, "collision without octrees", duration, "blue");
+    content += auxStr;
 
     addNewModel((new DrawMesh(triangles))->setTriangleColor(colColor2)->overrideModelName());
+
+    writeInTextFile(textFilePath, content);
 }
 
 void AlgGeom::SceneContent::triDrawTest()
@@ -1089,4 +1107,19 @@ Point AlgGeom::SceneContent::randomPointInUnitDisk(float diskR)
     vec3 vect = RandomUtilities::getUniformRandomInUnitDisk();
 
     return Point(vect.x * diskR, vect.y * diskR);
+}
+
+void AlgGeom::SceneContent::writeInTextFile(const std::string& filepath, const std::string& content)
+{
+    std::ofstream file(filepath);
+
+    if (file.is_open())
+    {
+        file << content;
+        file.close();
+    }
+    else
+    {
+        std::cerr << "Unable to open file." << std::endl;
+    }
 }

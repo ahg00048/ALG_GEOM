@@ -57,3 +57,9 @@ double SegmentLine3d::distance(Vect3d& v) {
 
 	return distance;
 }
+
+
+bool SegmentLine3d::compare(SegmentLine3d& segment)
+{
+	return (_orig == segment._orig && _dest == segment._dest) && (_orig == segment._dest && _dest == segment._orig);
+}

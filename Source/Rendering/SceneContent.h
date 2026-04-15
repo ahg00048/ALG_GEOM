@@ -31,8 +31,10 @@ namespace AlgGeom
 		void pr2D();
 		void pr3();
 		void pr4();
+		void pr5();
 
 		//tests
+		void triClassifyTest();
 		void triTriTest();
 		void boxBoxTest();
 		void triDrawTest();

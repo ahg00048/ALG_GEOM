@@ -140,6 +140,9 @@ public:
 	*/
 	virtual Triangle3d& operator=(const Triangle3d& triangle);
 
+
+	virtual bool operator==(const Triangle3d& triangle) const;
+
 	/**
 	*	@brief Cout overloading.
 	*/

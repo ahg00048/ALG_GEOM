@@ -25,8 +25,12 @@
 #pragma once
 
 #include <string>
+#include <list>
+#include <set>
+
 #include "AABB.h"
- //#include "TriangleMesh.h"
+#include "SegmentLine3d.h"
+#include "Triangle3d.h"
 #include "Vect3d.h"
 
 /**
@@ -142,4 +146,6 @@ public:
 	*	@brief Returns the number of points that this cloud contains.
 	*/
 	size_t size() { return _points.size(); }
+
+	std::vector<Triangle3d> giftWrapping();
 };

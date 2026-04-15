@@ -14,7 +14,7 @@
 
 void AlgGeom::SceneContent::buildScenario()
 {
-    pr4();
+    pr5();
 }
 
 
@@ -1020,6 +1020,63 @@ void AlgGeom::SceneContent::pr4()
     addNewModel((new DrawMesh(triangles))->setTriangleColor(colColor2)->overrideModelName());
 
     writeInTextFile(textFilePath, content);
+}
+
+
+/*
+* PR5 --------------------------------------------------------------------------------------------------------------------------------------------------------------
+*/
+
+void AlgGeom::SceneContent::pr5()
+{
+    int pointCloudSize = 100;
+    float pointCloudRadius = 2.0f;
+    vec3 pointCloudColor = { 1.0f, 0.0f, 0.0f };
+    float pcPointsSize = 3.0f;
+    PointCloud3d* pc = new PointCloud3d(pointCloudSize, pointCloudRadius);
+    
+    // We draw pc
+    addNewModel((new DrawPointCloud(*pc))->overrideModelName()->setPointColor(pointCloudColor)->setPointSize(pcPointsSize));
+
+    // Obtain gift wrapping
+    std::vector<Triangle3d> triangles = pc->giftWrapping();
+
+    // Draw gift wrapping
+    vec4 triColor = { 0.0f, 0.0f, 1.0f, 1.0f };
+    addNewModel((new DrawMesh(triangles))->overrideModelName()->setTriangleColor(triColor));
+
+    delete pc;
+}
+
+void AlgGeom::SceneContent::triClassifyTest()
+{
+    Vect3d a(1.0f, 0.0f, 1.0f);
+    Vect3d b(-1.0f, 0.0f, 1.0f);
+    Vect3d c(0.0f, 0.0f, -1.0f);
+    Vect3d d(5.0f, 1.0f, 0.0f);
+
+    Triangle3d tri(a, b, c);
+
+    addNewModel((new DrawTriangle(tri))->overrideModelName());
+    addNewModel((new DrawPoint(d))->overrideModelName());
+
+    std::string classification = "";
+    auto triClass = tri.classify(d);
+
+    switch (triClass)
+    {
+    case Triangle3d::PointPosition::POSITIVE:
+        classification = "Positive";
+        break;
+    case Triangle3d::PointPosition::NEGATIVE:
+        classification = "Negative";
+        break;
+    case Triangle3d::PointPosition::COPLANAR:
+        classification = "Coplanar";
+        break;
+    }
+
+    std::cout << classification;
 }
 
 void AlgGeom::SceneContent::triDrawTest()

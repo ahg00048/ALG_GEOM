@@ -61,6 +61,15 @@ public:
 	*/
 	virtual SegmentLine3d& operator=(const SegmentLine3d& segment);
 
+
+	virtual bool operator==(const SegmentLine3d& segment);
+
+
+	bool compare(const SegmentLine3d& segment);
+
+
+	float angle(SegmentLine3d& segment);
+
 	/**
 	*	@brief Shows the segment data at the debug window.
 	*/

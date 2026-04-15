@@ -37,10 +37,37 @@ AlgGeom::DrawMesh::DrawMesh(TriangleModel& triangleModel) : Model3D()
 AlgGeom::DrawMesh::DrawMesh(std::vector<Triangle3d*>& triangles)
 {
     Component* component = new Component;
-    
+
     for (unsigned i = 0; i < triangles.size(); i++)
     {
         Triangle3d* tri = triangles[i];
+        Vect3d triN = tri->normal();
+        vec3 n(triN.getX(), triN.getY(), triN.getZ());
+
+        component->_vertices.insert(component->_vertices.end(), {
+                VAO::Vertex { vec3(tri->getA().getX(), tri->getA().getY(), tri->getA().getZ()), n },
+                VAO::Vertex { vec3(tri->getB().getX(), tri->getB().getY(), tri->getB().getZ()), n },
+                VAO::Vertex { vec3(tri->getC().getX(), tri->getC().getY(), tri->getC().getZ()), n }
+            });
+
+        unsigned offset = 3;
+        component->_indices[VAO::IBO_TRIANGLE].insert(component->_indices[VAO::IBO_TRIANGLE].end(), { 0 + offset * i, 1 + offset * i, 2 + offset * i, RESTART_PRIMITIVE_INDEX });
+    }
+
+    component->completeTopology();
+
+    this->_components.push_back(std::unique_ptr<Component>(component));
+    this->buildVao(component);
+}
+
+
+AlgGeom::DrawMesh::DrawMesh(std::vector<Triangle3d>& triangles)
+{
+    Component* component = new Component;
+
+    for (unsigned i = 0; i < triangles.size(); i++)
+    {
+        Triangle3d* tri = &triangles[i];
         Vect3d triN = tri->normal();
         vec3 n(triN.getX(), triN.getY(), triN.getZ());
 

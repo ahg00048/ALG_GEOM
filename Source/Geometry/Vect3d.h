@@ -118,7 +118,11 @@ public:
 	/**
 	*	@brief Checks if two vectors are equal.
 	*/
-	virtual bool operator==(const Vect3d& vector);
+	virtual bool operator==(const Vect3d& vector) const;
+
+	
+	virtual bool operator<(const Vect3d& vector) const;
+
 
 	/**
 	*	@brief Checks if two vectors are distinct.

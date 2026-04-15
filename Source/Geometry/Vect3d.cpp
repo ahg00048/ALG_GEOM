@@ -90,9 +90,21 @@ Vect3d& Vect3d::operator=(const Vect3d& vector)
 	return *this;
 }
 
-bool Vect3d::operator==(const Vect3d& vector)
+bool Vect3d::operator==(const Vect3d& vector) const
 {
 	return BasicGeometry::equal(getX(), vector._value[X]) && BasicGeometry::equal(getY(), vector._value[Y]) && BasicGeometry::equal(getZ(), vector._value[Z]);
+}
+
+bool Vect3d::operator<(const Vect3d& vector) const
+{
+	float thisCoord = _value[X];
+	float otherCoord = vector._value[X];
+	if (!BasicGeometry::equal(thisCoord, otherCoord))
+	{
+		return thisCoord < otherCoord;
+	}
+
+	return _value[Y] < vector._value[Y];
 }
 
 bool Vect3d::operator!=(const Vect3d& vector)

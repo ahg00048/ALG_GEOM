@@ -3,11 +3,11 @@ debug
 Classifying octrees...
 
 EXERCISE 6: 
-  Time of the operation (collision with octrees): 236 ms
+  Time of the operation (collision with octrees): 20 ms
   Results in red
 
 
 EXERCISE 7: 
-  Time of the operation (collision without octrees): 28973 ms
+  Time of the operation (collision without octrees): 16305 ms
   Results in blue
 

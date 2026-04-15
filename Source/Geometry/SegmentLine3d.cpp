@@ -59,7 +59,24 @@ double SegmentLine3d::distance(Vect3d& v) {
 }
 
 
-bool SegmentLine3d::compare(SegmentLine3d& segment)
+bool SegmentLine3d::compare(const SegmentLine3d& segment)
 {
 	return (_orig == segment._orig && _dest == segment._dest) && (_orig == segment._dest && _dest == segment._orig);
+}
+
+bool SegmentLine3d::operator==(const SegmentLine3d& segment)
+{
+	return compare(segment);
+}
+
+
+
+float SegmentLine3d::angle(SegmentLine3d& segment)
+{
+	Vect3d otherDest = segment._dest;
+
+	Vect3d thisDir = _dest.sub(_orig);
+	Vect3d otherDir = otherDest.sub(segment._orig);
+
+	return acosf(thisDir.dot(otherDest) / (thisDir.module() * otherDir.module()));
 }

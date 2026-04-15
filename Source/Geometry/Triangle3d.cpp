@@ -396,6 +396,13 @@ Triangle3d& Triangle3d::operator=(const Triangle3d& triangle)
 	return *this;
 }
 
+bool Triangle3d::operator==(const Triangle3d& triangle) const
+{
+	return ((_a == triangle._a) && (_b == triangle._b) && (_c == triangle._c)) || 
+			((_a == triangle._c) && (_b == triangle._a) && (_c == triangle._b)) || 
+			((_a == triangle._b) && (_b == triangle._c) && (_c == triangle._a));
+}
+
 std::ostream& operator<<(std::ostream& os, const Triangle3d& triangle)
 {
 	std::cout << "Triangle 3D -> " << triangle._a << ", " << triangle._b << ", " << triangle._c;

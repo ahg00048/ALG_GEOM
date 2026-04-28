@@ -169,4 +169,8 @@ public:
 	void set(Vect3d& va, Vect3d& vb, Vect3d& vc);
 
 	void translate(Vect3d translation);
+
+	void changeNormalDir();
+
+	Vect3d get(int index) const;
 };

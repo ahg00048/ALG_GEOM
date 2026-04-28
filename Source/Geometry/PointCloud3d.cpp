@@ -274,7 +274,7 @@ std::vector<Triangle3d> PointCloud3d::giftWrapping()
 
 			Triangle3d::PointPosition classi = triABC.classify(v2);
 
-			if (classi == Triangle3d::PointPosition::POSITIVE) 
+			if (classi != Triangle3d::PointPosition::POSITIVE) 
 			{
 				valid = false;
 				break;
@@ -295,6 +295,7 @@ std::vector<Triangle3d> PointCloud3d::giftWrapping()
 	pointsInCH.insert(truePointB);
 	pointsInCH.insert(truePointC);
 
+	triABC.setC(truePointC);
 	triangles.push_back(triABC);
 
 	while (!boundaryCH.empty())
@@ -305,71 +306,92 @@ std::vector<Triangle3d> PointCloud3d::giftWrapping()
 		Vect3d segOrig = segmentAux.getOrigin();
 		Vect3d segDest = segmentAux.getDestination();
 
-		Triangle3d triAux(segOrig, segDest, _points.back());
+		Triangle3d triAux(segOrig, segDest, _points.front());
 		
-		for (Vect3d& v1 : _points)
+		bool notFound = true;
+		Vect3d pointV;
+		
+		for (int i = 0; i < 2; i++)
 		{
-			triAux.setC(v1);
-			
-			if (v1 == segOrig || v1 == segDest || std::find(triangles.cbegin(), triangles.cend(), triAux) != triangles.cend()) continue;
-			
-			bool valid = true;
-
-			for (Vect3d& v2 : _points)
+			for (Vect3d& v1 : _points)
 			{
-				if (v2 == segOrig || v2 == segDest || v2 == v1) continue;
+				triAux.setC(v1);
 
-				Triangle3d::PointPosition classi = triABC.classify(v2);
+				if (v1 == segOrig || v1 == segDest || std::find(triangles.cbegin(), triangles.cend(), triAux) != triangles.cend()) continue;
 
-				if (classi == Triangle3d::PointPosition::POSITIVE) valid = false;
+				bool valid = true;
+
+				for (Vect3d& v2 : _points)
+				{
+					if (v2 == segOrig || v2 == segDest || v2 == v1) continue;
+
+					Triangle3d::PointPosition classi = triAux.classify(v2);
+
+					if (classi != Triangle3d::PointPosition::POSITIVE)
+					{
+						valid = false;
+						break;
+					}
+				}
+
+				if (valid)
+				{
+					pointV = v1;
+					notFound = false;
+				}
 			}
 
-			if (valid) truePointC = v1;
+			if (!notFound) break;
+
+			triAux.changeNormalDir();
 		}
 
-		triAux.setC(truePointC);
+		triAux.setC(pointV);
+
 		triangles.push_back(triAux);
 
 		// Edges D-V and E-V
-		segmentAB.setOrigin(segOrig);
-		segmentAB.setDestination(truePointC);
-
-		segmentBC.setOrigin(segDest);
-		segmentBC.setDestination(truePointC);
-
-		if (!pointsInCH.contains(truePointC))
+		SegmentLine3d segmentDV(segOrig, pointV);
+		SegmentLine3d segmentEV(segDest, pointV);
+	
+		if (!pointsInCH.contains(pointV))
 		{
-			pointsInCH.insert(truePointC);
-			boundaryCH.push_back(segmentAB);
-			boundaryCH.push_back(segmentBC);
+			pointsInCH.insert(pointV);
+			boundaryCH.push_back(segmentDV);
+			boundaryCH.push_back(segmentEV);
 		}
 		else
 		{
-			std::list<SegmentLine3d>::iterator it1 = std::find(boundaryCH.begin(), boundaryCH.end(), segmentAB);
-			std::list<SegmentLine3d>::iterator it2 = std::find(boundaryCH.begin(), boundaryCH.end(), segmentBC);
+			std::list<SegmentLine3d>::iterator itDV = std::find(boundaryCH.begin(), boundaryCH.end(), segmentDV);
+			std::list<SegmentLine3d>::iterator itEV = std::find(boundaryCH.begin(), boundaryCH.end(), segmentEV);
 
-			if (it1 != boundaryCH.end() && it2 == boundaryCH.end())
+			if (itDV != boundaryCH.end() && itEV == boundaryCH.end())
 			{
-				boundaryCH.erase(it1);
-				boundaryCH.push_back(segmentBC);
+				boundaryCH.erase(itDV);
+				boundaryCH.push_back(segmentEV);
 			}
-			else if (it1 == boundaryCH.end() && it2 != boundaryCH.end())
+			else if (itDV == boundaryCH.end() && itEV != boundaryCH.end())
 			{
-				boundaryCH.erase(it2);
-				boundaryCH.push_back(segmentAB);
+				boundaryCH.erase(itEV);
+				boundaryCH.push_back(segmentDV);
 			}
-			else if (it1 != boundaryCH.end() && it2 != boundaryCH.end())
+			else if (itDV != boundaryCH.end() && itEV != boundaryCH.end())
 			{
-				boundaryCH.erase(it1);
-				boundaryCH.erase(it2);
+				boundaryCH.erase(itEV);
+				if (!notFound)
+				{
+					boundaryCH.erase(itDV);
+				}
 			}
 			else
 			{
-				boundaryCH.push_back(segmentAB);
-				boundaryCH.push_back(segmentBC);
+				boundaryCH.push_back(segmentDV);
+				boundaryCH.push_back(segmentEV);
 			}
 		}
 	}
 
 	return triangles;
 }
+
+

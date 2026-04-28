@@ -59,14 +59,9 @@ double SegmentLine3d::distance(Vect3d& v) {
 }
 
 
-bool SegmentLine3d::compare(const SegmentLine3d& segment)
+bool SegmentLine3d::operator==(const SegmentLine3d& segment) const
 {
-	return (_orig == segment._orig && _dest == segment._dest) && (_orig == segment._dest && _dest == segment._orig);
-}
-
-bool SegmentLine3d::operator==(const SegmentLine3d& segment)
-{
-	return compare(segment);
+	return (_orig == segment._orig && _dest == segment._dest) || (_orig == segment._dest && _dest == segment._orig);
 }
 
 

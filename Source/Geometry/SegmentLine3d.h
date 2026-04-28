@@ -62,10 +62,7 @@ public:
 	virtual SegmentLine3d& operator=(const SegmentLine3d& segment);
 
 
-	virtual bool operator==(const SegmentLine3d& segment);
-
-
-	bool compare(const SegmentLine3d& segment);
+	virtual bool operator==(const SegmentLine3d& segment) const;
 
 
 	float angle(SegmentLine3d& segment);

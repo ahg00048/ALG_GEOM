@@ -1034,7 +1034,6 @@ void AlgGeom::SceneContent::pr5()
     vec3 pointCloudColor = { 1.0f, 0.0f, 0.0f };
     float pcPointsSize = 3.0f;
     PointCloud3d* pc = new PointCloud3d(pointCloudSize, pointCloudRadius);
-    
     // We draw pc
     addNewModel((new DrawPointCloud(*pc))->overrideModelName()->setPointColor(pointCloudColor)->setPointSize(pcPointsSize));
 
@@ -1044,6 +1043,16 @@ void AlgGeom::SceneContent::pr5()
     // Draw gift wrapping
     vec4 triColor = { 0.0f, 0.0f, 1.0f, 1.0f };
     addNewModel((new DrawMesh(triangles))->overrideModelName()->setTriangleColor(triColor));
+ 
+    //const std::string filePath = "E:/UJA/4º ano/2º semestre/geometricos/practicas/Instalación Plataforma-20260203/AlgoritmosGeometricosUJA/vs/Source/Assets/Models/vaca.obj";
+    //TriangleModel* tModel1 = new TriangleModel(filePath);
+    //std::vector<Vect3d>* modelPoints = tModel1->getVertices();
+
+    //addNewModel((new DrawMesh(*tModel1))->overrideModelName());
+    //PointCloud3d* pc2 = new PointCloud3d(*modelPoints);
+    //triangles = pc2->giftWrapping();
+
+    //addNewModel((new DrawMesh(triangles))->overrideModelName()->setTriangleColor(triColor));
 
     delete pc;
 }

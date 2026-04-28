@@ -398,9 +398,20 @@ Triangle3d& Triangle3d::operator=(const Triangle3d& triangle)
 
 bool Triangle3d::operator==(const Triangle3d& triangle) const
 {
-	return ((_a == triangle._a) && (_b == triangle._b) && (_c == triangle._c)) || 
-			((_a == triangle._c) && (_b == triangle._a) && (_c == triangle._b)) || 
-			((_a == triangle._b) && (_b == triangle._c) && (_c == triangle._a));
+	int counter = 0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if (get(i) == triangle.get(j))
+			{
+				counter++;
+			}
+		}
+	}
+
+	return counter == 3;
 }
 
 std::ostream& operator<<(std::ostream& os, const Triangle3d& triangle)
@@ -628,4 +639,29 @@ void Triangle3d::translate(Vect3d translation)
 	_a = _a.add(translation);
 	_b = _b.add(translation);
 	_c = _c.add(translation);
+}
+
+void Triangle3d::changeNormalDir()
+{
+	Vect3d aux = _b;
+	_b = _a;
+	_a = aux;
+}
+
+Vect3d Triangle3d::get(int index) const
+{
+	switch (index)
+	{
+	case 0:
+		return _a;
+		break;
+	case 1:
+		return _b;
+		break;
+	case 2:
+		return _c;
+		break;
+	default:
+		return Vect3d();
+	}
 }
